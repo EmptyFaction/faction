@@ -1,0 +1,613 @@
+{
+  "sanction-webhook": "",
+  "nick-webhook": "",
+  "ranks": {
+    "joueur": {
+      "gamertag": "§7[{fac}§7]\n§7{name}",
+      "chat": "§7[§e{fac}§7] {name} : {msg}",
+      "homes": 5,
+      "enderchest": 9,
+      "market": 5,
+      "outpost": 3000,
+      "xp": 0,
+      "boost": 0,
+      "teleportation": 5,
+      "tax": 10
+    },
+    "prime": {
+      "gamertag": "§7[§e{fac}§7]\n§7{name}",
+      "chat": "§7[§e{fac}§7][§ePrime§7] §e{name} §e: §7{msg}",
+      "homes": 7,
+      "enderchest": 13,
+      "market": 7,
+      "outpost": 3500,
+      "xp": 20,
+      "boost": 5,
+      "teleportation": 5,
+      "tax": 8
+    },
+    "prime-plus": {
+      "gamertag": "§e[{fac}]\n§f{name}",
+      "chat": "§e[{fac}][Prime+] {name} : §f{msg}",
+      "homes": 9,
+      "enderchest": 17,
+      "market": 10,
+      "outpost": 4000,
+      "xp": 40,
+      "boost": 5,
+      "teleportation": 5,
+      "tax": 6
+    },
+    "becteur": {
+      "gamertag": "§2[§a{fac}§2]\n§f{name}",
+      "chat": "§2[§e{fac}§2][§aBecteur§2] §a{name} §2: §f{msg}",
+      "homes": 11,
+      "enderchest": 22,
+      "market": 12,
+      "outpost": 4500,
+      "xp": 60,
+      "boost": 10,
+      "teleportation": 3,
+      "tax": 4
+    },
+    "becteur-plus": {
+      "gamertag": "§2[§b{fac}§2]\n§f{name}",
+      "chat": "§3[§e{fac}§3][§bBecteur+§3] §b{name} §3: §f{msg}",
+      "homes": 13,
+      "enderchest": 27,
+      "market": 15,
+      "outpost": 5000,
+      "xp": 80,
+      "boost": 10,
+      "teleportation": 3,
+      "tax": 2
+    },
+    "yt": {
+      "gamertag": "§f[§4{fac}§f]\n§c{name}",
+      "chat": "§f[§e{fac}§f][§4Y§cT§f] §c{name} §4: §c{msg}"
+    },
+    "brouteur": {
+      "gamertag": "§5[§d{fac}§5]\n§f{name}",
+      "chat": "§5[§e{fac}§5][§dBrouteur§5] §d{name} §5: §f{msg}",
+      "homes": 15,
+      "enderchest": 27,
+      "market": 18,
+      "outpost": 6000,
+      "xp": 100,
+      "boost": 15,
+      "teleportation": -1,
+      "tax": 0
+    },
+    "staff": {
+      "gamertag": "§6[{fac}]\n§6{name}",
+      "chat": "§6[§e{fac}§6][Staff] {name} : {msg}"
+    },
+    "admin": {
+      "gamertag": "§c[{fac}]\n§c{name}",
+      "chat": "§c[§e{fac}§c][Administrateur] {name} : {msg}"
+    },
+    "responsable": {
+      "gamertag": "§6[{fac}]\n§6{name}",
+      "chat": "§6[§e{fac}§c][Responsable] {name} : {msg}"
+    },
+    "fondateur": {
+      "gamertag": "§4[{fac}]\n§4{name}",
+      "chat": "§4[§e{fac}§4][Fonda] {name} : {msg}"
+    }
+  },
+  "unicodes": {
+    "0": "",
+    "1": "",
+    "2": "",
+    "3": "",
+    "4": "",
+    "5": "",
+    "6": "",
+    "7": "",
+    "8": "",
+    "9": "",
+    "a": "",
+    "b": "",
+    "c": "",
+    "d": "",
+    "e": "",
+    "f": "",
+    "g": "",
+    "h": "",
+    "i": "",
+    "j": "",
+    "k": "",
+    "l": "",
+    "m": "",
+    "n": "",
+    "o": "",
+    "p": "",
+    "q": "",
+    "r": "",
+    "s": "",
+    "t": "",
+    "u": "",
+    "v": "",
+    "w": "",
+    "x": "",
+    "y": "",
+    "z": ""
+  },
+  "commands": [
+    "about",
+    "ban-ip",
+    "banlist",
+    "ban",
+    "stop",
+    "clear",
+    "checkperm",
+    "defaultgamemode",
+    "extractplugin",
+    "gamemode",
+    "gamerule",
+    "genplugin",
+    "help",
+    "kick",
+    "kill",
+    "listperms",
+    "makeplugin",
+    "me",
+    "tell",
+    "msg",
+    "w",
+    "suicide",
+    "list",
+    "pardon",
+    "pardon-ip",
+    "save-all",
+    "save-off",
+    "enchant",
+    "save-on",
+    "seed",
+    "spawnpoint",
+    "title",
+    "unban",
+    "unban-ip"
+  ],
+  "welcome-messages": [
+    "Dites bonjour à @{player} qui vient de découvrir le meilleur serveur WW",
+    "Salem akhy @{player} t'es bien sélectionné",
+    "Bienvenue à @{player} sur EmptyFaction !",
+    "Le goat @{player} vient de découvrir le serveur ",
+    "@{player} A son prime vient de rejoindre le serveur ",
+    "Bienvenue à toi @{player} ! Passes du bon temps",
+    "Hey @{player} ! Bienvenue mon gars",
+    "Salut @{player} nous sommes content de taccueillir aujourdhui et jespère que tu te plairas ici",
+    "Heureux de te rencontrer @{player} fais comme chez toi",
+    "Bienvenue sur le serveur @{player} dites lui salem l'équipe !",
+    "Bienvenue @{player} ! Passes un bon moment le frérot",
+    "Salem @{player}, amuses toi bien my g"
+  ],
+  "words-list": [
+    "neuille",
+    "rassemblementnational",
+    "jordanbardella",
+    "bassem",
+    "sioniste",
+    "genocideagaza",
+    "antimetissage",
+    "kanyewest",
+    "playboycarti",
+    "maxenceautiste",
+    "kenzachadli",
+    "bitcoin",
+    "solana",
+    "bectance",
+    "chatgpt",
+    "inoxtag",
+    "nasdas",
+    "paracetamol",
+    "codeine",
+    "framboise",
+    "fraise",
+    "malade",
+    "neuillard",
+    "beurette",
+    "mullvad",
+    "telegram",
+    "discord",
+    "oppenheimer",
+    "ismail",
+    "haram",
+    "dayouth",
+    "quebec",
+    "banane",
+    "maxoooz",
+    "batori",
+    "arrow",
+    "fliqi",
+    "kanye",
+    "empty",
+    "anticonstitutionnellement",
+    "haramiste",
+    "empereurmobydick",
+    "palestine",
+    "israel",
+    "juif",
+    "musulman",
+    "chretien",
+    "football",
+    "efour la vache",
+    "mobutu",
+    "kylian",
+    "khadafi",
+    "alqaida",
+    "etatislamique",
+    "hezbolla",
+    "marseille",
+    "nice",
+    "grignysurseine",
+    "bourges",
+    "paris",
+    "lehavre",
+    "strasbourg",
+    "dijon",
+    "nelsonmandela",
+    "rosaparks",
+    "segregation",
+    "liban",
+    "italie",
+    "espagne",
+    "maroc",
+    "algerie",
+    "tiktok",
+    "quebec",
+    "tabuernak",
+    "calisse",
+    "poutine"
+  ],
+  "default-data": {
+    "faction": null,
+    "back": null,
+    "money": 1000,
+    "ecoin": 0,
+    "kill": 0,
+    "death": 0,
+    "killstreak": 0,
+    "played_time": 0,
+    "scoreboard": true,
+    "cobblestone": true,
+    "faction_chat": false,
+    "ally_chat": false,
+    "night_vision": false,
+    "coordinates": false,
+    "border": false,
+    "homes": [],
+    "cooldowns": [],
+    "blocked": [],
+    "kits": [],
+    "ip": [],
+    "uuid": [],
+    "did": [],
+    "jobs": {
+      "Miner": {
+        "lvl": 1,
+        "xp": 0
+      },
+      "Farmer": {
+        "lvl": 1,
+        "xp": 0
+      },
+      "Hunter": {
+        "lvl": 1,
+        "xp": 0
+      }
+    },
+    "staff_mod": [
+      false,
+      null,
+      null
+    ]
+  },
+  "saves": [
+    "ip",
+    "uuid",
+    "did"
+  ],
+  "jobs": {
+    "lvls": [
+      50000,
+      50000
+    ],
+    "rewards": {
+    }
+  },
+  "zones": {
+    "spawn": "-62:-999:-62:62:999:62:map",
+    "warzone": "511:-999:511:-512:999:-512:map",
+    "koth": "-132:65.5:24:-137:70:29:map",
+    "outpost": "67:65.5:136:73:70:142:map",
+    "money-zone": "1:64:83:-1:69:85:map"
+  },
+  "floatings": {
+    "70.5:67:139.5:map": "outpost",
+    "-134:68:27:map": "koth",
+    "0.5:66.5:84.5:map": "money-zone"
+  },
+  "messages": [
+    "Rejoignez le discord du serveur: §cdiscord.gg/emptyfaction",
+    "Si vous avez une §cquestion §fou un §cproblème§f, contactez un membre du §cstaff",
+    "EmptyFaction §c-§f 2024"
+  ],
+  "nexus": "-54.5:67:145.5",
+  "permissions": {
+    "delete": "Supprimer la faction §c(Risqué)",
+    "leader": "Promouvoir chef un membre §c(Risqué)",
+    "permissions": "Modifier les permissions §c(Risqué)",
+    "invite": "Inviter des joueurs",
+    "kick": "Expulser des membres",
+    "sethome": "Définir la position du f home",
+    "delhome": "Supprimer le f home",
+    "claim": "Récupérer un claim",
+    "unclaim": "Supprimer son claim",
+    "logs": "Accèder aux logs",
+    "rename": "Renommer la faction",
+    "home": "Se téléporter au f home",
+    "place": "Placer des blocs",
+    "break": "Casser des blocs",
+    "chest": "Ouvrir des coffres",
+    "fence-gates": "Ouvrir les portillons",
+    "trapdoor": "Ouvrir les traps",
+    "door": "Ouvrir les portes",
+    "demote": "Rétrograder des membres",
+    "withdraw": "Récupérer de l'argent dans la banque de faction",
+    "promote": "Promouvoir des membres",
+    "ally": "Demande une autre faction en alliance",
+    "allyaccept": "Accepter une demande d'alliance",
+    "allybreak": "Arrêter une alliance"
+  },
+  "claims": [
+    100,
+    500,
+    800,
+    1000,
+    1700,
+    2700,
+    5000,
+    6500,
+    9000,
+    10000
+  ],
+  "faction-ranks": {
+    "leader": "Chef",
+    "officier": "Officier",
+    "member": "Membre",
+    "recruit": "Recrue"
+  },
+  "sanctions": {
+    "ban": {
+      "Cheat": [
+        1728000,
+        -1
+      ],
+      "Refus de verification": [
+        604800,
+        1728000
+      ],
+      "DDoS / Dox": [
+        604800,
+        2592000,
+        -1
+      ],
+      "Full Back": [
+        36000,
+        43200,
+        57600,
+        72000
+      ],
+      "Camping": [
+        36000,
+        43200,
+        57600,
+        72000
+      ],
+      "Hosting": [
+        36000,
+        43200,
+        57600,
+        72000
+      ],
+      "Usebug": [
+        43200,
+        64800,
+        86400,
+        108000
+      ],
+      "Freekill": [
+        43200,
+        64800,
+        86400,
+        108000
+      ],
+      "Insiding": [
+        43200,
+        64800,
+        86400,
+        108000
+      ],
+      "Trap Inapproprié": [
+        43200,
+        64800,
+        86400,
+        108000
+      ],
+      "Echanges Interdits": [
+        1728000,
+        -1
+      ],
+      "Duplication / Usage de bugs": [
+        1728000,
+        -1
+      ],
+      "Contournement de bannissement": [
+        -1
+      ],
+      "Arnaque": [
+        259200,
+        432000,
+        604800
+      ],
+      "Trahison": [
+        86400,
+        432000,
+        604800
+      ]
+    },
+    "mute": {
+      "Langage Inapproprié": [
+        900,
+        1800,
+        3600,
+        7200,
+        10800,
+        18000
+      ],
+      "Provocations": [
+        900,
+        1800,
+        3600
+      ],
+      "Spam": [
+        900,
+        1800,
+        3600,
+        7200
+      ],
+      "Discriminations": [
+        3600,
+        7200,
+        10800,
+        18000
+      ],
+      "Flood": [
+        900,
+        1800,
+        3600
+      ],
+      "Dox (et menace)": [
+        86400,
+        604800,
+        2592000,
+        -1
+      ]
+    },
+    "kick": {
+      "Nick Inapproprié": [],
+      "Skin Inapproprié": [],
+      "Full Back": [],
+      "Camping": [],
+      "Hosting": []
+    }
+  },
+  "shop": {
+    "Bourse Agriculture": {
+      "type": "bourse"
+    }
+  },
+  "bourse": {
+    "Cactus": "cactus",
+    "Betterave": "beetroot",
+    "Pomme de Terre": "potato",
+    "Pastèque": "melon_slice",
+    "Carotte": "carrot",
+    "Bambou": "bamboo",
+    "Baies sucrées": "sweet_berries",
+    "Blé": "wheat",
+    "Cannes à Sucres": "sugar_cane"
+  },
+  "interval": {
+    "300": "question",
+    "500": "save"
+  },
+  "planning": {
+  },
+  "clean-save-data": [
+    "firstPlayed",
+    "lastPlayed",
+    "SpawnZ",
+    "SpawnY",
+    "SpawnX",
+    "SpawnLevel",
+    "Level",
+    "LastKnownXUID",
+    "Skin",
+    "Pos",
+    "Rotation",
+    "Motion",
+    "EnderChestInventory",
+    "CustomName",
+    "CustomNameVisible",
+    "OnGround",
+    "Fire",
+    "FallDistance",
+    "Air"
+  ],
+  "directions": [
+    {
+      "min": 0,
+      "max": 22.5,
+      "direction": "O"
+    },
+    {
+      "min": 22.5,
+      "max": 67.5,
+      "direction": "NO"
+    },
+    {
+      "min": 67.5,
+      "max": 112.5,
+      "direction": "N"
+    },
+    {
+      "min": 112.5,
+      "max": 157.5,
+      "direction": "NE"
+    },
+    {
+      "min": 157.5,
+      "max": 202.5,
+      "direction": "E"
+    },
+    {
+      "min": 202.5,
+      "max": 247.5,
+      "direction": "SE"
+    },
+    {
+      "min": 247.5,
+      "max": 292.5,
+      "direction": "S"
+    },
+    {
+      "min": 292.5,
+      "max": 337.5,
+      "direction": "SO"
+    },
+    {
+      "min": 337.5,
+      "max": 360,
+      "direction": "O"
+    }
+  ],
+  "crafts": {
+    "remove": [
+    ],
+    "add": [
+    ]
+  },
+  "entities": {
+    "minecraft:zombie": {
+      "height": 1.9,
+      "width": 0.6,
+      "name": "Zombie",
+      "french": "Zombie",
+      "drops": [],
+      "xp": 5
+    }
+  }
+}

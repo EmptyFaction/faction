@@ -1,0 +1,8 @@
+name: Faction
+main: Faction\Main
+
+src-namespace-prefix: Faction
+
+author: MaXoooZ
+api: [ 5.0.0 ]
+version: 0.0.1
