@@ -132,6 +132,51 @@ class Player extends PmPlayer
         parent::attack($source);
     }
 
+    private function returnItemsFromAction(Item $oldHeldItem, Item $newHeldItem, array $extraReturnedItems): void
+    {
+        $heldItemChanged = false;
+
+        if (!$newHeldItem->equalsExact($oldHeldItem) && $oldHeldItem->equalsExact($this->inventory->getItemInHand())) {
+            //determine if the item was changed in some meaningful way, or just damaged/changed count
+            //if it was really changed we always need to set it, whether we have finite resources or not
+            $newReplica = clone $oldHeldItem;
+            $newReplica->setCount($newHeldItem->getCount());
+            if ($newReplica instanceof Durable && $newHeldItem instanceof Durable) {
+                $newReplica->setDamage($newHeldItem->getDamage());
+            }
+            $damagedOrDeducted = $newReplica->equalsExact($newHeldItem);
+
+            if (!$damagedOrDeducted || $this->hasFiniteResources()) {
+                if ($newHeldItem instanceof Durable && $newHeldItem->isBroken()) {
+                    $this->broadcastSound(new ItemBreakSound());
+                }
+                $this->inventory->setItemInHand($newHeldItem);
+                $heldItemChanged = true;
+            }
+        }
+
+        if (!$heldItemChanged) {
+            $newHeldItem = $oldHeldItem;
+        }
+
+        if ($heldItemChanged && count($extraReturnedItems) > 0 && $newHeldItem->isNull()) {
+            $this->inventory->setItemInHand(array_shift($extraReturnedItems));
+        }
+        foreach ($this->inventory->addItem(...$extraReturnedItems) as $drop) {
+            $ev = new PlayerDropItemEvent($this, $drop);
+
+            if ($this->isSpectator()) {
+                $ev->cancel();
+            }
+
+            $ev->call();
+
+            if (!$ev->isCancelled()) {
+                $this->dropItem($drop);
+            }
+        }
+    }
+
     public function onUpdate(int $currentTick): bool
     {
         $this->blockBreakHandlerCustom?->update() ?: $this->blockBreakHandlerCustom = null;
@@ -211,62 +256,10 @@ class Player extends PmPlayer
         return false;
     }
 
-
     public function stopBreakBlock(Vector3 $pos): void
     {
         if ($this->blockBreakHandlerCustom !== null && $this->blockBreakHandlerCustom->getBlockPos()->distanceSquared($pos) < 0.0001) {
             $this->blockBreakHandlerCustom = null;
-        }
-    }
-
-    protected function destroyCycles(): void
-    {
-        parent::destroyCycles();
-        $this->blockBreakHandlerCustom = null;
-    }
-
-    private function returnItemsFromAction(Item $oldHeldItem, Item $newHeldItem, array $extraReturnedItems): void
-    {
-        $heldItemChanged = false;
-
-        if (!$newHeldItem->equalsExact($oldHeldItem) && $oldHeldItem->equalsExact($this->inventory->getItemInHand())) {
-            //determine if the item was changed in some meaningful way, or just damaged/changed count
-            //if it was really changed we always need to set it, whether we have finite resources or not
-            $newReplica = clone $oldHeldItem;
-            $newReplica->setCount($newHeldItem->getCount());
-            if ($newReplica instanceof Durable && $newHeldItem instanceof Durable) {
-                $newReplica->setDamage($newHeldItem->getDamage());
-            }
-            $damagedOrDeducted = $newReplica->equalsExact($newHeldItem);
-
-            if (!$damagedOrDeducted || $this->hasFiniteResources()) {
-                if ($newHeldItem instanceof Durable && $newHeldItem->isBroken()) {
-                    $this->broadcastSound(new ItemBreakSound());
-                }
-                $this->inventory->setItemInHand($newHeldItem);
-                $heldItemChanged = true;
-            }
-        }
-
-        if (!$heldItemChanged) {
-            $newHeldItem = $oldHeldItem;
-        }
-
-        if ($heldItemChanged && count($extraReturnedItems) > 0 && $newHeldItem->isNull()) {
-            $this->inventory->setItemInHand(array_shift($extraReturnedItems));
-        }
-        foreach ($this->inventory->addItem(...$extraReturnedItems) as $drop) {
-            $ev = new PlayerDropItemEvent($this, $drop);
-
-            if ($this->isSpectator()) {
-                $ev->cancel();
-            }
-
-            $ev->call();
-
-            if (!$ev->isCancelled()) {
-                $this->dropItem($drop);
-            }
         }
     }
 
@@ -290,6 +283,12 @@ class Player extends PmPlayer
     {
         Util::updateNametag($this);
         parent::heal($source);
+    }
+
+    protected function destroyCycles(): void
+    {
+        parent::destroyCycles();
+        $this->blockBreakHandlerCustom = null;
     }
 
     protected function entityBaseTick(int $tickDiff = 1): bool

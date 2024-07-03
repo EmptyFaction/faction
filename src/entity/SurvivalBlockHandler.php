@@ -59,12 +59,72 @@ final class SurvivalBlockHandler
         }
 
         $breakTimePerTick = $this->getBreakTime($this->block->getBreakInfo(), $this->player->getInventory()->getItemInHand()) * 20;
-        var_dump($breakTimePerTick);
 
         if ($breakTimePerTick > 0) {
             return 1 / $breakTimePerTick;
         }
         return 1;
+    }
+
+    public function getBreakTime(BlockBreakInfo $breakInfo, Item $item): float
+    {
+        $base = $breakInfo->getHardness();
+
+        if ($this->isToolCompatible($breakInfo, $item)) {
+            $base *= BlockBreakInfo::COMPATIBLE_TOOL_MULTIPLIER;
+        } else {
+            $base *= BlockBreakInfo::INCOMPATIBLE_TOOL_MULTIPLIER;
+        }
+
+        $extraItem = ExtraVanillaItems::getItem($item);
+
+        if ($extraItem instanceof FarmAxe) {
+            $efficiency = $this->getMiningEfficiency(
+                true,
+                $extraItem->getBaseEfficiency(),
+                $item,
+            );
+        } else {
+            $efficiency = $item->getMiningEfficiency(($breakInfo->getToolType() & $item->getBlockToolType()) !== 0);
+        }
+
+        if ($efficiency <= 0) {
+            throw new InvalidArgumentException(get_class($item) . " has invalid mining efficiency: expected >= 0, got $efficiency");
+        }
+
+        $base /= $efficiency;
+        return max(0.051, $base);
+    }
+
+    public function isToolCompatible(BlockBreakInfo $breakInfo, Item $tool): bool
+    {
+        if ($breakInfo->getHardness() < 0) {
+            return false;
+        }
+
+        if (ExtraVanillaItems::getItem($tool) instanceof FarmAxe) {
+            $toolType = BlockToolType::PICKAXE;
+            $harvestLevel = ToolTier::NETHERITE()->getHarvestLevel();
+        } else {
+            $toolType = $tool->getBlockToolType();
+            $harvestLevel = $tool->getBlockToolHarvestLevel();
+        }
+
+        return $breakInfo->getToolType() === BlockToolType::NONE || $breakInfo->getToolHarvestLevel() === 0 || (($breakInfo->getToolType() & $toolType) !== 0 && $harvestLevel >= $breakInfo->getToolHarvestLevel());
+    }
+
+    public function getMiningEfficiency(bool $isCorrectTool, int $baseEfficiency, Item $item): float
+    {
+        $efficiency = 1;
+        if ($isCorrectTool) {
+            $efficiency = $baseEfficiency;
+
+            if (($enchantmentLevel = $item->getEnchantmentLevel(VanillaEnchantments::EFFICIENCY())) > 0) {
+                $efficiency += ($enchantmentLevel ** 2 + 1);
+            }
+        }
+
+        return $efficiency;
     }
 
     public function update(): bool
@@ -125,66 +185,5 @@ final class SurvivalBlockHandler
                 LevelEventPacket::create(LevelEvent::BLOCK_STOP_BREAK, 0, $this->blockPos)
             );
         }
-    }
-
-    public function isToolCompatible(BlockBreakInfo $breakInfo, Item $tool): bool
-    {
-        if ($breakInfo->getHardness() < 0) {
-            return false;
-        }
-
-        if (ExtraVanillaItems::getItem($tool) instanceof FarmAxe) {
-            $toolType = BlockToolType::PICKAXE;
-            $harvestLevel = ToolTier::NETHERITE()->getHarvestLevel();
-        } else {
-            $toolType = $tool->getBlockToolType();
-            $harvestLevel = $tool->getBlockToolHarvestLevel();
-        }
-
-        return $breakInfo->getToolType() === BlockToolType::NONE || $breakInfo->getToolHarvestLevel() === 0 || (($breakInfo->getToolType() & $toolType) !== 0 && $harvestLevel >= $breakInfo->getToolHarvestLevel());
-    }
-
-    public function getBreakTime(BlockBreakInfo $breakInfo, Item $item): float
-    {
-        $base = $breakInfo->getHardness();
-
-        if ($this->isToolCompatible($breakInfo, $item)) {
-            $base *= BlockBreakInfo::COMPATIBLE_TOOL_MULTIPLIER;
-        } else {
-            $base *= BlockBreakInfo::INCOMPATIBLE_TOOL_MULTIPLIER;
-        }
-
-        $extraItem = ExtraVanillaItems::getItem($item);
-
-        if ($extraItem instanceof FarmAxe) {
-            $efficiency = $this->getMiningEfficiency(
-                true,
-                $extraItem->getBaseEfficiency(),
-                $item,
-            );
-        } else {
-            $efficiency = $item->getMiningEfficiency(($breakInfo->getToolType() & $item->getBlockToolType()) !== 0);
-        }
-
-        if ($efficiency <= 0) {
-            throw new InvalidArgumentException(get_class($item) . " has invalid mining efficiency: expected >= 0, got $efficiency");
-        }
-
-        $base /= $efficiency;
-        return $base;
-    }
-
-    public function getMiningEfficiency(bool $isCorrectTool, int $baseEfficiency, Item $item): float
-    {
-        $efficiency = 1;
-        if ($isCorrectTool) {
-            $efficiency = $baseEfficiency;
-
-            if (($enchantmentLevel = $item->getEnchantmentLevel(VanillaEnchantments::EFFICIENCY())) > 0) {
-                $efficiency += ($enchantmentLevel ** 2 + 1);
-            }
-        }
-
-        return $efficiency;
     }
 }

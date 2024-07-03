@@ -6,8 +6,8 @@ use CortexPE\Commando\args\TargetPlayerArgument;
 use CortexPE\Commando\BaseCommand;
 use Faction\Main;
 use Faction\Session;
-use Faction\task\TeleportationTask;
 use Faction\Util;
+use Faction\task\teleportation\TeleportationTask;
 use pocketmine\command\CommandSender;
 use pocketmine\permission\DefaultPermissions;
 use pocketmine\player\Player;
@@ -58,9 +58,9 @@ class Tpaccept extends BaseCommand
             $session->data["teleportation"] = [];
 
             if ($type === "tpa") {
-                Main::getInstance()->getScheduler()->scheduleRepeatingTask(new TeleportationTask($player, $sender->getPosition(), 15), 20);
+                Main::getInstance()->getScheduler()->scheduleRepeatingTask(new TeleportationTask($player, $sender->getPosition(), "tpa", 15), 20);
             } else {
-                Main::getInstance()->getScheduler()->scheduleRepeatingTask(new TeleportationTask($sender, $player->getPosition(), 15), 20);
+                Main::getInstance()->getScheduler()->scheduleRepeatingTask(new TeleportationTask($sender, $player->getPosition(), "tpa", 15), 20);
             }
 
             $player->sendMessage(Util::PREFIX . "Le joueur §c" . $sender->getName() . " §fa accepté votre demande de téléportation");

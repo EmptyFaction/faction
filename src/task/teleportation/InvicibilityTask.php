@@ -1,6 +1,6 @@
 <?php
 
-namespace Faction\task;
+namespace Faction\task\teleportation;
 
 use Faction\Util;
 use pocketmine\player\Player;

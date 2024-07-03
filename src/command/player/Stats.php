@@ -55,7 +55,7 @@ class Stats extends BaseCommand
                 $data = $file->getAll();
             }
 
-            $bar = "§l§8-----------------------";
+            $bar = "§l§7-----------------------------";
 
             $faction = $data["faction"];
             $faction = (is_null($faction)) ? "Aucune Faction" : Faction::getFactionUpperName($faction);
@@ -64,6 +64,7 @@ class Stats extends BaseCommand
             $sender->sendMessage("§c[§f" . $faction . "§c] [§f" . ucfirst(strtolower($data["rank"])) . "§c] §f- §c" . $username);
             $sender->sendMessage("§cArgent: §f" . $data["money"]);
             $sender->sendMessage("§cECoins: §f" . $data["ecoin"]);
+            $sender->sendMessage("§cPoints: §f" . $data["point"]);
             $sender->sendMessage("§cKills: §f" . $data["kill"]);
             $sender->sendMessage("§cMorts: §f" . $data["death"]);
             $sender->sendMessage("§cRatio: §f" . round($data["kill"] / max(1, $data["death"]), 2));

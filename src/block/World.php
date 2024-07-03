@@ -2,7 +2,6 @@
 
 namespace Faction\block;
 
-use Faction\block\tile\SpawnerTile;
 use Faction\command\player\rank\Craft;
 use muqsit\invmenu\InvMenu;
 use muqsit\invmenu\InvMenuHandler;
@@ -10,7 +9,6 @@ use muqsit\invmenu\type\graphic\InvMenuGraphic;
 use muqsit\invmenu\type\InvMenuType;
 use muqsit\invmenu\type\util\InvMenuTypeBuilders;
 use pocketmine\block\inventory\CraftingTableInventory;
-use pocketmine\block\tile\TileFactory;
 use pocketmine\block\VanillaBlocks;
 use pocketmine\inventory\Inventory;
 use pocketmine\math\Vector3;

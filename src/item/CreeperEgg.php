@@ -10,11 +10,6 @@ use pocketmine\world\World;
 
 class CreeperEgg extends Item
 {
-    public static function createEntity(World $world, Vector3 $pos, float $yaw, float $pitch): Creeper
-    {
-        return new Creeper(Location::fromObject($pos, $world, $yaw, $pitch));
-    }
-
     public function onInteract(PlayerInteractEvent $event): bool
     {
         $player = $event->getPlayer();
@@ -31,5 +26,10 @@ class CreeperEgg extends Item
         $this->projectileSucces($player, $item);
 
         return true;
+    }
+
+    public static function createEntity(World $world, Vector3 $pos, float $yaw, float $pitch): Creeper
+    {
+        return new Creeper(Location::fromObject($pos, $world, $yaw, $pitch));
     }
 }

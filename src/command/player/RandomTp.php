@@ -5,8 +5,8 @@ namespace Faction\command\player;
 use CortexPE\Commando\BaseCommand;
 use Faction\Main;
 use Faction\Session;
-use Faction\task\TeleportationTask;
 use Faction\Util;
+use Faction\task\teleportation\TeleportationTask;
 use pocketmine\block\VanillaBlocks;
 use pocketmine\command\CommandSender;
 use pocketmine\permission\DefaultPermissions;
@@ -41,7 +41,7 @@ class RandomTp extends BaseCommand
                 return;
             }
 
-            Main::getInstance()->getScheduler()->scheduleRepeatingTask(new TeleportationTask($sender, $this->generatePos(), 0, true), 20);
+            Main::getInstance()->getScheduler()->scheduleRepeatingTask(new TeleportationTask($sender, $this->generatePos(), "rtp", 0, true), 20);
         }
     }
 

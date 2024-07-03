@@ -5,8 +5,8 @@ namespace Faction\command\util;
 use CortexPE\Commando\BaseCommand;
 use Faction\Main;
 use Faction\Session;
-use Faction\task\TeleportationTask;
 use Faction\Util;
+use Faction\task\teleportation\TeleportationTask;
 use pocketmine\command\CommandSender;
 use pocketmine\permission\DefaultPermissions;
 use pocketmine\player\Player;
@@ -43,7 +43,8 @@ class Spawn extends BaseCommand
 
             Main::getInstance()->getScheduler()->scheduleRepeatingTask(new TeleportationTask(
                 $sender,
-                Position::fromObject($pos->add(0.5, 0, 0.5), $pos->getWorld())
+                Position::fromObject($pos->add(0.5, 0, 0.5), $pos->getWorld()),
+                "spawn"
             ), 20);
         }
     }

@@ -22,6 +22,7 @@ use Faction\command\faction\subcommands\Kick;
 use Faction\command\faction\subcommands\Leader;
 use Faction\command\faction\subcommands\Leave;
 use Faction\command\faction\subcommands\Logs;
+use Faction\command\faction\subcommands\Map;
 use Faction\command\faction\subcommands\Permissions;
 use Faction\command\faction\subcommands\Promote;
 use Faction\command\faction\subcommands\Rename;
@@ -67,6 +68,7 @@ class Faction extends BaseCommand
         $this->registerSubCommand(new Leader());
         $this->registerSubCommand(new Leave());
         $this->registerSubCommand(new Logs());
+        $this->registerSubCommand(new Map());
         $this->registerSubCommand(new Permissions());
         $this->registerSubCommand(new Promote());
         $this->registerSubCommand(new Rename());

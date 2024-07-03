@@ -61,7 +61,7 @@ class Reclaim extends BaseCommand
         }
 
         $form->setTitle("Remboursement");
-        $form->setContent(Util::PREFIX . "Cliquez sur le bouton de choix");
+        $form->setContent(Util::ARROW . "Cliquez sur le bouton de choix");
         $player->sendForm($form);
     }
 

@@ -5,14 +5,17 @@ namespace Faction\block;
 use Faction\command\player\RandomTp;
 use Faction\command\player\XpBottle;
 use Faction\handler\Faction;
+use Faction\handler\trait\CooldownTrait;
 use Faction\item\CreeperEgg;
 use Faction\Session;
 use Faction\Util;
+use jojoe77777\FormAPI\SimpleForm;
 use pocketmine\block\Block as PmBlock;
 use pocketmine\block\VanillaBlocks;
 use pocketmine\entity\effect\EffectInstance;
 use pocketmine\entity\effect\VanillaEffects;
 use pocketmine\event\block\BlockBreakEvent;
+use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\item\Item;
 use pocketmine\item\StringToItemParser;
 use pocketmine\item\VanillaItems;
@@ -26,6 +29,8 @@ use pocketmine\world\sound\ClickSound;
 
 class Luckyblock extends Block
 {
+    use CooldownTrait;
+
     public function onBreak(BlockBreakEvent $event): bool
     {
         $player = $event->getPlayer();
@@ -86,25 +91,115 @@ class Luckyblock extends Block
         return parent::onBreak($event);
     }
 
-    public function createLava(Player $player): void
+    public function getReward(): mixed
     {
-        $world = $player->getWorld();
-        $pos = $player->getPosition();
+        $rewards = $this->getRewards();
 
-        for ($x = -1; $x <= 1; $x++) {
-            for ($z = -1; $z <= 1; $z++) {
-                $newPos = Position::fromObject($pos->add($x, 0, $z), $world);
-                $currentBlock = $world->getBlock($newPos);
+        $totalWeight = array_sum(array_map("floatval", array_keys($rewards)));
+        $randomWeight = mt_rand(0, floor($totalWeight * 100)) / 100;
 
-                if (
-                    Faction::canBuild($player, $newPos, "break") &&
-                    !$currentBlock->hasSameTypeId(VanillaBlocks::BEDROCK())
-                ) {
-                    $block = VanillaBlocks::LAVA();
-                    $world->setBlock($newPos, $block);
-                }
+        $currentWeight = 0;
+
+        foreach ($rewards as $weight => $reward) {
+            $currentWeight += floatval($weight);
+
+            if ($currentWeight >= $randomWeight) {
+                return $reward;
             }
         }
+        return null;
+    }
+
+    public function getRewardPercentages(): array
+    {
+        $rewards = $this->getRewards();
+        $result = [];
+
+        $totalWeight = array_sum(array_map("floatval", array_keys($rewards)));
+        $i = 0;
+
+        foreach ($rewards as $weight => $reward) {
+            $percentage = number_format((floatval($weight) / $totalWeight) * 100, 2);
+            $result[$i . "|" . $percentage] = $reward;
+
+            $i++;
+        }
+
+        return $result;
+    }
+
+    public function getRewards(): array
+    {
+        return [
+            "2.00" => ["une §cpelle boostée", VanillaItems::IRON_SHOVEL()],
+            "2.01" => ["un §carrosoir", VanillaItems::GOLDEN_HOE()],
+            "4.01" => ["§c32 §fblocs d'obsidienne", VanillaBlocks::OBSIDIAN()->asItem()->setCount(32)],
+            "4.02" => ["§c16 §fblocs de fer", VanillaBlocks::IRON()->asItem()->setCount(16)],
+            "3.01" => ["§c64 §fblocs de fer", VanillaBlocks::IRON()->asItem()->setCount(64)],
+            "3.02" => ["§c2 §fémeraudes", VanillaItems::EMERALD()->setCount(2)],
+            "3.03" => ["§c6 §fémeraudes", VanillaItems::EMERALD()->setCount(6)],
+            "2.06" => ["§c4 §fémeraudes", VanillaItems::EMERALD()->setCount(4)],
+            "2.03" => ["§c8 §fblocs d'obsidienne en émeraude", VanillaBlocks::CRYING_OBSIDIAN()->asItem()->setCount(8)],
+            "5.01" => ["§c24 §fdiamants", VanillaItems::DIAMOND()->setCount(24)],
+            "4.03" => ["§c48 §fdiamants", VanillaItems::DIAMOND()->setCount(48)],
+            "4.04" => ["une §ctable d'enchantment", VanillaBlocks::ENCHANTING_TABLE()->asItem()],
+            "4.05" => ["une §cenclume", VanillaBlocks::ANVIL()->asItem()],
+            "2.04" => ["une §cnetherstar", VanillaItems::NETHER_STAR()],
+            "4.06" => ["une §cboussole", VanillaItems::COMPASS()],
+            "5.03" => ["§c64 §fcharbons", VanillaItems::COAL()->setCount(64)],
+            "2.05" => ["§c3 §foeufs de creeper ", (StringToItemParser::getInstance()->parse("creeper_spawn_egg") ?? VanillaItems::AIR())->setCount(3)],
+            "6.02" => ["1000$", 1000],
+            "6.01" => ["5000$", 5000],
+            "4.07" => ["une §cbouteille d'xp §fde §c20 §fniveaux", XpBottle::createXpBottle(20)],
+            "4.09" => ["une §cbouteille d'xp §fde §c5 §fniveaux", XpBottle::createXpBottle(5)],
+            "3.09" => ["§cinvisible §fpendant §c4 §fminutes", new EffectInstance(VanillaEffects::INVISIBILITY(), 4 * 20 * 60, 0)],
+            "3.08" => ["§clenteur §fpendant §cune §fminute", new EffectInstance(VanillaEffects::SLOWNESS(), 20 * 60, 3)],
+            "3.07" => ["votre casque est remplacé par une tête de citrouille", "pumpkin"],
+            "7.06" => ["un creeper qui apparait et qui explose", "tnt"],
+            "8.05" => ["un lac de lave qui apparait autour de vous", "lava"],
+            "6.08" => ["une prison qui apparait autour de vous", "prison"],
+            "3.04" => ["téléportation aléatoire dans la map", "rtp"],
+            "7.01" => ["rien", null],
+            "5.07" => ["§c64 §fblocs de pierre", VanillaBlocks::STONE()->asItem()->setCount(64)],
+            "5.08" => ["§c64 §fblocs de terre", VanillaBlocks::DIRT()->asItem()->setCount(64)],
+            "5.09" => ["§c64 §fblocs de chêne", VanillaBlocks::OAK_LOG()->asItem()->setCount(64)],
+            "5.04" => ["un §cluckyblock", VanillaBlocks::NETHER_QUARTZ_ORE()->asItem()->setCount(1)],
+            "5.05" => ["§c3 §fluckyblock", VanillaBlocks::NETHER_QUARTZ_ORE()->asItem()->setCount(3)],
+            "5.06" => ["§c6 §fpomme en or", VanillaItems::GOLDEN_APPLE()->setCount(6)],
+            "4.08" => ["une §cépée en émeraude", VanillaItems::GOLDEN_SWORD()],
+            "4.10" => ["un §ccasque en émeraude", VanillaItems::GOLDEN_HELMET()],
+            "4.11" => ["des §cbottes en émeraude", VanillaItems::GOLDEN_BOOTS()]
+
+            // TODO AJOUTER DES POMME ZE3F
+            // TODO KING KONG
+            // TODO AJOUTER UNE CAPE
+        ];
+    }
+
+    public function onInteract(PlayerInteractEvent $event): bool
+    {
+        $player = $event->getPlayer();
+
+        if ($event->getAction() === $event::RIGHT_CLICK_BLOCK && $player->isSneaking() && !$this->inCooldown($player)) {
+            $this->sendRewardsPercentagesForm($player);
+            $this->setCooldown($player, 1);
+        }
+
+        return false;
+    }
+
+    public function sendRewardsPercentagesForm(Player $player): void
+    {
+        $content = Util::ARROW . "Voici toutes les récompenses possible grace aux luckyblocks\n";
+
+        foreach ($this->getRewardPercentages() as $percentage => $data) {
+            $content .= "\n§c" . explode("|", $percentage)[1] . "% " . Util::ARROW . $data[0];
+        }
+
+        $form = new SimpleForm(null);
+        $form->setTitle("LuckyBlock");
+        $form->setContent($content);
+        $player->sendForm($form);
     }
 
     public function createPrison(Player $player): void
@@ -134,6 +229,27 @@ class Luckyblock extends Block
         }
     }
 
+    public function createLava(Player $player): void
+    {
+        $world = $player->getWorld();
+        $pos = $player->getPosition();
+
+        for ($x = -1; $x <= 1; $x++) {
+            for ($z = -1; $z <= 1; $z++) {
+                $newPos = Position::fromObject($pos->add($x, 0, $z), $world);
+                $currentBlock = $world->getBlock($newPos);
+
+                if (
+                    Faction::canBuild($player, $newPos, "break") &&
+                    !$currentBlock->hasSameTypeId(VanillaBlocks::BEDROCK())
+                ) {
+                    $block = VanillaBlocks::LAVA();
+                    $world->setBlock($newPos, $block);
+                }
+            }
+        }
+    }
+
     public function createAnimation(Position $blockPos): void
     {
         $world = $blockPos->getWorld();
@@ -158,73 +274,6 @@ class Luckyblock extends Block
                 $world->addSound($randomPos, new ClickSound());
             }
         }
-    }
-
-    public function getRewards(): array
-    {
-        return [
-            "2.00" => ["une §cpelle boostée", VanillaItems::IRON_SHOVEL()],     // Pelle boostée
-            "2.01" => ["un §carrosoir", VanillaItems::GOLDEN_HOE()],                 // ARROSOIR
-            "4.01" => ["§c32 §fblocs d'obsidienne", VanillaBlocks::OBSIDIAN()->asItem()->setCount(32)],
-            "4.02" => ["§c16 §fblocs de fer", VanillaBlocks::IRON()->asItem()->setCount(16)],
-            "3.01" => ["§c64 §fblocs de fer", VanillaBlocks::IRON()->asItem()->setCount(64)],
-            "3.02" => ["§c2 §fémeraudes", VanillaItems::EMERALD()->setCount(2)],
-            "3.03" => ["§c6 §fémeraudes", VanillaItems::EMERALD()->setCount(6)],
-            "2.06" => ["§c4 §fémeraudes", VanillaItems::EMERALD()->setCount(4)],
-            "2.03" => ["§c8 §fblocs d'obsidienne en émeraude", VanillaBlocks::CRYING_OBSIDIAN()->asItem()->setCount(8)],
-            "5.01" => ["§c24 §fdiamants", VanillaItems::DIAMOND()->setCount(24)],
-            "4.03" => ["§c48 §fdiamants", VanillaItems::DIAMOND()->setCount(48)],
-            "4.04" => ["une §ctable d'enchantment", VanillaBlocks::ENCHANTING_TABLE()->asItem()],
-            "4.05" => ["une §cenclume", VanillaBlocks::ANVIL()->asItem()],
-            "2.04" => ["une §cnetherstar", VanillaItems::NETHER_STAR()],
-            "4.06" => ["une §cboussole", VanillaItems::COMPASS()],
-            "5.03" => ["§c64 §fcharbons", VanillaItems::COAL()->setCount(64)],
-            "2.05" => ["§c3 §foeufs de creeper ", (StringToItemParser::getInstance()->parse("creeper_spawn_egg") ?? VanillaItems::AIR())->setCount(3)],
-            "6.02" => ["", 1000],
-            "6.01" => ["", 5000],
-            "4.07" => ["une §cbouteille d'xp §fde §c20 §fniveaux", XpBottle::createXpBottle(20)],
-            "4.09" => ["une §cbouteille d'xp §fde §c5 §fniveaux", XpBottle::createXpBottle(5)],
-            "3.09" => ["§cinvisible §fpendant §c4 §fminutes", new EffectInstance(VanillaEffects::INVISIBILITY(), 4 * 20 * 60, 0)],
-            "3.08" => ["§clenteur §fpendant §cune §fminute", new EffectInstance(VanillaEffects::SLOWNESS(), 20 * 60, 3)],
-            "3.07" => ["", "pumpkin"],
-            "7.06" => ["", "tnt"],
-            "8.05" => ["", "lava"],
-            "6.08" => ["", "prison"],
-            "3.04" => ["", "rtp"],
-            "7.01" => ["", null],
-            "5.07" => ["§c64 §fblocs de pierre", VanillaBlocks::STONE()->asItem()->setCount(64)],
-            "5.08" => ["§c64 §fblocs de terre", VanillaBlocks::DIRT()->asItem()->setCount(64)],
-            "5.09" => ["§c64 §fblocs de chêne", VanillaBlocks::OAK_LOG()->asItem()->setCount(64)],
-            "5.04" => ["un §cluckyblock", VanillaBlocks::NETHER_QUARTZ_ORE()->asItem()->setCount(1)],
-            "5.05" => ["§c3 §fluckyblock", VanillaBlocks::NETHER_QUARTZ_ORE()->asItem()->setCount(3)],
-            "5.06" => ["§c6 §fpomme en or", VanillaItems::GOLDEN_APPLE()->setCount(6)],
-            "4.08" => ["une §cépée en émeraude", VanillaItems::GOLDEN_SWORD()],
-            "4.10" => ["un §ccasque en émeraude", VanillaItems::GOLDEN_HELMET()],
-            "4.11" => ["des §cbottes en émeraude", VanillaItems::GOLDEN_BOOTS()]
-
-            // TODO AJOUTER DES POMME ZE3F
-            // TODO KING KONG
-            // TODO AJOUTER UNE CAPE
-        ];
-    }
-
-    public function getReward(): mixed
-    {
-        $rewards = $this->getRewards();
-
-        $totalWeight = array_sum(array_map("floatval", array_keys($rewards)));
-        $randomWeight = mt_rand(0, floor($totalWeight * 100)) / 100;
-
-        $currentWeight = 0;
-
-        foreach ($rewards as $weight => $reward) {
-            $currentWeight += floatval($weight);
-
-            if ($currentWeight >= $randomWeight) {
-                return $reward;
-            }
-        }
-        return null;
     }
 
     public function getDrops(PmBlock $block, Item $item, Player $player = null): ?array

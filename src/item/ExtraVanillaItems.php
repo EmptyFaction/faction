@@ -4,6 +4,7 @@ namespace Faction\item;
 
 use Faction\item\enchantment\Enchantments;
 use Faction\Util;
+use pocketmine\block\VanillaBlocks;
 use pocketmine\data\bedrock\item\SavedItemData;
 use pocketmine\entity\effect\VanillaEffects;
 use pocketmine\inventory\CreativeInventory;
@@ -52,6 +53,9 @@ class ExtraVanillaItems
         self::addItem(VanillaItems::NAUTILUS_SHELL(), new HangGlider());
         self::addItem(VanillaItems::IRON_SHOVEL(), new BoostedShovel());
 
+        self::addItem(VanillaBlocks::MOB_HEAD()->asItem(), new EffectHead());
+
+        self::addUnknowItem("rapid_fertilizer", new RapidFertilizer());
         self::addUnknowItem("creeper_spawn_egg", new CreeperEgg());
 
         new Craft();
@@ -72,10 +76,13 @@ class ExtraVanillaItems
         }
     }
 
-    public static function registerItem(string $id, PmItem $item): void
+    public static function registerItem(string $id, PmItem $item, bool $first): void
     {
-        GlobalItemDataHandlers::getDeserializer()->map($id, fn() => clone $item);
-        GlobalItemDataHandlers::getSerializer()->map($item, fn() => new SavedItemData($id));
+        if ($first) {
+            GlobalItemDataHandlers::getDeserializer()->map($id, fn() => clone $item->clearCustomName());
+            GlobalItemDataHandlers::getSerializer()->map($item->clearCustomName(), fn() => new SavedItemData($id));
+        }
+
         StringToItemParser::getInstance()->override($id, fn() => clone $item);
         CreativeInventory::getInstance()->add($item);
     }

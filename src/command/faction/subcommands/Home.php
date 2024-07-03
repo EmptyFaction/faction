@@ -6,8 +6,8 @@ use Faction\command\faction\FactionCommand;
 use Faction\handler\Cache;
 use Faction\Main;
 use Faction\Session;
-use Faction\task\TeleportationTask;
 use Faction\Util;
+use Faction\task\teleportation\TeleportationTask;
 use pocketmine\permission\DefaultPermissions;
 use pocketmine\player\Player;
 use pocketmine\world\Position;
@@ -46,7 +46,7 @@ class Home extends FactionCommand
         [$x, $y, $z] = explode(":", Cache::$factions[$faction]["home"]);
 
         $position = new Position(intval($x), intval($y), intval($z), Main::getInstance()->getServer()->getWorldManager()->getDefaultWorld());
-        Main::getInstance()->getScheduler()->scheduleRepeatingTask(new TeleportationTask($sender, $position), 20);
+        Main::getInstance()->getScheduler()->scheduleRepeatingTask(new TeleportationTask($sender, $position, "faction_home"), 20);
     }
 
     protected function prepare(): void

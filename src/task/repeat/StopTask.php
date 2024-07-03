@@ -1,6 +1,6 @@
 <?php
 
-namespace Faction\task;
+namespace Faction\task\repeat;
 
 use Faction\command\staff\op\Stop;
 use Faction\Main;

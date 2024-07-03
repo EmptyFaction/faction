@@ -10,6 +10,7 @@ use pocketmine\crafting\MetaWildcardRecipeIngredient;
 use pocketmine\item\StringToItemParser;
 use pocketmine\player\Player;
 use pocketmine\utils\SingletonTrait;
+use Symfony\Component\Filesystem\Path;
 use WeakMap;
 
 class Cache
@@ -37,6 +38,8 @@ class Cache
     /* @var WeakMap<Player, boolean> */
     public static WeakMap $borderPlayers;
     /* @var WeakMap<Player, boolean> */
+    public static WeakMap $factionMapPlayers;
+    /* @var WeakMap<Player, boolean> */
     public static WeakMap $combatPlayers;
 
     public function __construct()
@@ -45,11 +48,13 @@ class Cache
 
         self::$scoreboardPlayers ??= new WeakMap();
         self::$borderPlayers ??= new WeakMap();
+        self::$factionMapPlayers ??= new WeakMap();
         self::$combatPlayers ??= new WeakMap();
 
         @mkdir(Main::getInstance()->getDataFolder() . "data/");
         @mkdir(Main::getInstance()->getDataFolder() . "data/players");
         @mkdir(Main::getInstance()->getDataFolder() . "data/inventories/");
+        @mkdir(Main::getInstance()->getDataFolder() . "data/skins/");
 
         Main::getInstance()->saveResource("config.json", true);
 
@@ -63,6 +68,25 @@ class Cache
         self::$factions = Util::getFile("data/factions")->getAll();
         self::$durability = Util::getFile("data/durability")->getAll();
 
+        foreach (Util::listAllFiles(Path::join(Main::getInstance()->getFile(), "resources", "cosmetics")) as $file) {
+            $data = pathinfo($file);
+
+            $dirs = explode(DIRECTORY_SEPARATOR, $data["dirname"]);
+            $elements = array_slice($dirs, -2);
+
+            $name = $elements[1];
+            $type = $elements[0];
+
+            switch ($data["extension"]) {
+                case "json":
+                    Cosmetics::$skins[$type][$name]["geometry"] = file_get_contents($file);
+                    break;
+                case "png":
+                    Cosmetics::$skins[$type][$name]["texture"] = Cosmetics::getBytesFromImage($file);
+                    break;
+            }
+        }
+
         foreach (Util::listAllFiles(Main::getInstance()->getDataFolder() . "data/players") as $file) {
             $path = pathinfo($file);
             $username = $path["filename"];
@@ -70,10 +94,16 @@ class Cache
             $file = Util::getFile("data/players/" . $username);
 
             self::$players["money"][$username] = $file->get("money", 0);
+            self::$players["ecoin"][$username] = $file->get("ecoin", 0);
+
             self::$players["kill"][$username] = $file->get("kill", 0);
             self::$players["death"][$username] = $file->get("death", 0);
+
+            self::$players["point"][$username] = $file->get("point", 0);
+
             self::$players["killstreak"][$username] = $file->get("killstreak", 0);
             self::$players["played_time"][$username] = $file->get("played_time", 0);
+
             self::$players["upper_name"][strtolower($username)] = $file->get("upper_name", $username);
 
             foreach (Cache::$config["saves"] as $column) {

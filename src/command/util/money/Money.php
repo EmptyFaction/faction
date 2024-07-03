@@ -8,6 +8,11 @@ use Faction\Main;
 use Faction\Session;
 use Faction\Util;
 use pocketmine\command\CommandSender;
+use pocketmine\item\enchantment\EnchantmentInstance;
+use pocketmine\item\enchantment\VanillaEnchantments;
+use pocketmine\item\ExperienceBottle;
+use pocketmine\item\Item;
+use pocketmine\item\VanillaItems;
 use pocketmine\permission\DefaultPermissions;
 use pocketmine\player\Player;
 use pocketmine\plugin\PluginBase;
@@ -29,7 +34,7 @@ class Money extends BaseCommand
     {
         if (!isset($args["joueur"])) {
             if ($sender instanceof Player) {
-                $sender->sendMessage(Util::PREFIX . "Vous possèdez §c" . Session::get($sender)->data["money"] . " §fpièces");
+                $sender->sendMessage(Util::PREFIX . "Vous possèdez §c" . Session::get($sender)->data["money"] . "$");
             }
         } else {
             /** @noinspection PhpDeprecationInspection */
@@ -37,12 +42,21 @@ class Money extends BaseCommand
 
             if (!$target instanceof Player) {
                 if ($sender instanceof Player) {
-                    $sender->sendMessage(Util::PREFIX . "Vous possèdez §c" . Session::get($sender)->data["money"] . " §fpièces");
+                    $sender->sendMessage(Util::PREFIX . "Vous possèdez §c" . Session::get($sender)->data["money"] . "$");
                 }
                 return;
             }
-            $sender->sendMessage(Util::PREFIX . "Le joueur §c" . $target->getName() . "§f possède §c" . Session::get($target)->data["money"] . " §fpièces");
+            $sender->sendMessage(Util::PREFIX . "Le joueur §c" . $target->getName() . "§f possède §c" . Session::get($target)->data["money"] . "$");
         }
+    }
+
+    public static function createPaperMoney(int $amount): Item
+    {
+        $item = VanillaItems::PAPER();
+        $item->getNamedTag()->setInt("money", $amount);
+        $item->addEnchantment(new EnchantmentInstance(VanillaEnchantments::FORTUNE()));
+        $item->setCustomName("§r§fBillet de §c" . $amount . "$");
+        return $item;
     }
 
     protected function prepare(): void

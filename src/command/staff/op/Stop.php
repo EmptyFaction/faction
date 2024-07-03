@@ -5,7 +5,7 @@ namespace Faction\command\staff\op;
 use CortexPE\Commando\args\IntegerArgument;
 use CortexPE\Commando\BaseCommand;
 use Faction\Main;
-use Faction\task\StopTask;
+use Faction\task\repeat\StopTask;
 use pocketmine\command\CommandSender;
 use pocketmine\permission\DefaultPermissions;
 use pocketmine\plugin\PluginBase;

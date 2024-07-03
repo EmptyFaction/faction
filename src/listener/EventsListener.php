@@ -10,7 +10,7 @@ use Faction\command\util\Bienvenue;
 use Faction\entity\Creeper;
 use Faction\entity\LogoutNpc;
 use Faction\entity\Player as CustomPlayer;
-use Faction\handler\{Cache, Faction, Jobs, Rank};
+use Faction\handler\{Cache, Cosmetics, Faction, Jobs, Rank};
 use Faction\item\ExtraVanillaItems;
 use Faction\item\FarmAxe;
 use Faction\Main;
@@ -37,12 +37,13 @@ use pocketmine\block\{Anvil,
     Trapdoor,
     VanillaBlocks};
 use pocketmine\entity\animation\ArmSwingAnimation;
-use pocketmine\entity\effect\{EffectInstance, VanillaEffects};
+use pocketmine\entity\object\PrimedTNT;
 use pocketmine\event\block\{BlockBreakEvent, BlockPlaceEvent, BlockSpreadEvent};
 use pocketmine\event\entity\{EntityDamageByEntityEvent, EntityDamageEvent, EntityExplodeEvent, EntityItemPickupEvent};
 use pocketmine\event\inventory\{CraftItemEvent, InventoryOpenEvent, InventoryTransactionEvent, ItemDamageEvent};
 use pocketmine\event\Listener;
 use pocketmine\event\player\{PlayerBucketEvent,
+    PlayerChangeSkinEvent,
     PlayerChatEvent,
     PlayerCreationEvent,
     PlayerDataSaveEvent,
@@ -180,6 +181,9 @@ class EventsListener implements Listener
 
             $event->cancel();
             return;
+        } else if (!(Cache::$data["chat"] ?? true) && !$player->hasPermission(DefaultPermissions::ROOT_OPERATOR)) {
+            $player->sendMessage(Util::PREFIX . "Le chat est actuellement désactivé !");
+            return;
         }
 
         $rank = ($player->getName() === $player->getDisplayName()) ? Rank::getRank($player->getName()) : "joueur";
@@ -231,8 +235,8 @@ class EventsListener implements Listener
             if ($inventory instanceof ArmorInventory) {
                 $targetItem = $inventory->getItem($slot);
 
-                ExtraVanillaItems::getItem($oldItem)->removeEffects($inventory);
-                ExtraVanillaItems::getItem($targetItem)->addEffects($inventory);
+                ExtraVanillaItems::getItem($oldItem)->removeEffects($inventory, $oldItem);
+                ExtraVanillaItems::getItem($targetItem)->addEffects($inventory, $targetItem);
             }
         }, null));
 
@@ -240,6 +244,8 @@ class EventsListener implements Listener
 
         Rank::updateNameTag($player);
         Rank::addPermissions($player);
+
+        Cosmetics::checkSkin($player);
     }
 
     public function onRespawn(PlayerRespawnEvent $event): void
@@ -262,7 +268,7 @@ class EventsListener implements Listener
         Main::getInstance()->getServer()->broadcastTip("§c- " . $player->getName() . " -");
         $event->setQuitMessage("");
 
-        if (Util::getTpTime($player) > 0) {
+        if (Util::getTpTime($player, "disconnect") > 0) {
             $entity = new LogoutNpc($player->getLocation(), $player->getSkin());
             $entity->initEntityB($player);
             $entity->spawnToAll();
@@ -312,10 +318,17 @@ class EventsListener implements Listener
                 $damagerSession->addValue("kill");
                 $damagerSession->addValue("killstreak");
 
-                if (Faction::hasFaction($damager)) Faction::addPower($damagerSession->data["faction"], 2);
-                if (Faction::hasFaction($player)) Faction::addPower($session->data["faction"], -mt_rand(3, 4));
+                if (!Faction::isFreekill($player, $damager)) {
+                    if (Faction::hasFaction($damager)) Faction::addPower($damagerSession->data["faction"], 2);
+                    if (Faction::hasFaction($player)) Faction::addPower($session->data["faction"], -mt_rand(3, 4));
 
-                Jobs::addXp($damager, "Hunter", 50 + $damagerSession->data["killstreak"]);
+                    $damagerSession->addValue("point", 2);
+                    $session->addValue("point", mt_rand(3, 4), true);
+
+                    Jobs::addXp($player, "Hunter", 50);
+                }
+
+                Faction::addFreekill($player, $damager);
                 return;
             }
         } else {
@@ -329,6 +342,12 @@ class EventsListener implements Listener
     public function onItemDamage(ItemDamageEvent $event): void
     {
         ExtraVanillaItems::getItem($event->getItem())->onDamage($event);
+    }
+
+    public function onChangeSkin(PlayerChangeSkinEvent $event): void
+    {
+        $skin = Cosmetics::checkSkin($event->getPlayer(), $event->getNewSkin());
+        $event->setNewSkin($skin);
     }
 
     public function onDamage(EntityDamageEvent $event): void
@@ -404,9 +423,9 @@ class EventsListener implements Listener
 
         if ($session->data["staff_mod"][0]) {
             $command = match ($item->getCustomName()) {
-                "§r" . Util::PREFIX . "Vanish §c§l«" => "/vanish",
-                "§r" . Util::PREFIX . "Random Tp §c§l«" => "/randomtp",
-                "§r" . Util::PREFIX . "Spectateur §c§l«" => "/spec",
+                "§r" . Util::ARROW . "Vanish" . Util::IARROW => "/vanish",
+                "§r" . Util::ARROW . "Random Tp" . Util::IARROW => "/prtp",
+                "§r" . Util::ARROW . "Spectateur" . Util::IARROW => "/spec",
                 default => null
             };
 
@@ -599,9 +618,25 @@ class EventsListener implements Listener
         }
 
         if ($block->hasSameTypeId(VanillaBlocks::COBBLESTONE()) || $block->hasSameTypeId(VanillaBlocks::STONE())) {
-            Jobs::addXp($player, "Mineur", 1);
+            Jobs::addXp($player, "Miner", 1);
         } else if ($block->hasSameTypeId(VanillaBlocks::MELON()) || ($block instanceof Crops && !$block->ticksRandomly())) {
-            Jobs::addXp($player, "Farmeur", mt_rand(1, 3));
+            Jobs::addXp($player, "Farmer", mt_rand(1, 3));
+        }
+
+        $xp = match ($block->getTypeId()) {
+            VanillaBlocks::COAL_ORE()->getTypeId() => 2,
+            VanillaBlocks::IRON_ORE()->getTypeId() => 4,
+            VanillaBlocks::GOLD_ORE()->getTypeId() => 10,
+            VanillaBlocks::DIAMOND_ORE()->getTypeId() => 20,
+            VanillaBlocks::EMERALD_ORE()->getTypeId() => 40,
+            VanillaBlocks::ANCIENT_DEBRIS()->getTypeId() => 80,
+            VanillaBlocks::REDSTONE_ORE()->getTypeId() => 5,
+            VanillaBlocks::LAPIS_LAZULI()->getTypeId() => 5,
+            default => null
+        };
+
+        if (is_int($xp)) {
+            Jobs::addXp($player, "Miner", $xp);
         }
 
         Util::addItems($player, $event->getDrops());
@@ -678,7 +713,7 @@ class EventsListener implements Listener
     {
         $blockList = $event->getBlockList();
 
-        if (!$event->getEntity() instanceof Creeper) {
+        if (!$event->getEntity() instanceof Creeper && !$event->getEntity() instanceof PrimedTNT) {
             return;
         }
 
@@ -686,34 +721,34 @@ class EventsListener implements Listener
             $safeBlocks = [
                 VanillaBlocks::LAVA(), VanillaBlocks::WATER(),
                 VanillaBlocks::OBSIDIAN(), VanillaBlocks::BEDROCK(),
-                VanillaBlocks::ENCHANTING_TABLE(), // Miss command block
+                VanillaBlocks::ENCHANTING_TABLE(),
                 VanillaBlocks::ENDER_CHEST(), VanillaBlocks::BARRIER(),
                 VanillaBlocks::BARRIER(), VanillaBlocks::CRYING_OBSIDIAN()
             ];
 
-            foreach ($safeBlocks as $key => $value) {
+            foreach ($safeBlocks as $index => $value) {
                 if ($value instanceof Block && ExtraVanillaBlocks::getBlock($value) instanceof Durability) {
-                    unset($safeBlocks[$key]);
+                    unset($safeBlocks[$index]);
                 }
             }
 
             $durability = null;
-            $cblock = ExtraVanillaBlocks::getBlock($block);
-
             $position = $block->getPosition();
+
+            $filteredBlocks = array_filter($safeBlocks, function($value) use ($block) {
+                return $value instanceof Block && $value instanceof $block;
+            });
+
+            if (count($filteredBlocks) > 0 || Util::insideZone($position, "warzone")) {
+                unset($blockList[$id]);
+                continue;
+            }
+
+            $cblock = ExtraVanillaBlocks::getBlock($block);
 
             if ($cblock instanceof Durability) {
                 $durability = $cblock->getDurability();
             } else {
-                continue;
-            }
-
-            $include = array_reduce($safeBlocks, function ($carry, $safeBlock) use ($block) {
-                return $carry || $block instanceof $safeBlock;
-            }, false);
-
-            if ($include || Util::insideZone($position, "warzone")) {
-                unset($blockList[$id]);
                 continue;
             }
 

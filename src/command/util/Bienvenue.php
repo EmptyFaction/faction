@@ -40,13 +40,12 @@ class Bienvenue extends BaseCommand
             }
 
             $message = str_replace("{player}", Bienvenue::$lastJoin, Cache::$config["welcome-messages"][array_rand(Cache::$config["welcome-messages"])]);
-            $message = Rank::setReplace(Rank::getRankValue(Rank::getRank($sender->getName()), "chat"), $sender, $message);
 
             Bienvenue::$alreadyWished[] = $sender->getName();
             $session->addValue("money", 500);
 
             $sender->chat($message);
-            $sender->sendMessage(Util::PREFIX . "Vous avez reçu §c500 §fpièces car vous avez souhaité la bienvenue de §c" . Bienvenue::$lastJoin);
+            $sender->sendMessage(Util::PREFIX . "Vous avez reçu §c500$ §fcar vous avez souhaité la bienvenue de §c" . Bienvenue::$lastJoin);
         }
     }
 

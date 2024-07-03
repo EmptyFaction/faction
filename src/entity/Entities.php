@@ -3,12 +3,16 @@
 namespace Faction\entity;
 
 use Faction\entity\effect\Effects;
+use Faction\entity\animation\Box;
+use Faction\entity\animation\DefaultFloatingText;
+use Faction\entity\animation\DynamicFloatingText;
+use Faction\entity\animation\Message;
+use pocketmine\data\SavedDataLoadingException;
 use pocketmine\entity\EntityDataHelper;
 use pocketmine\entity\EntityFactory;
-use pocketmine\entity\object\ExperienceOrb;
+use pocketmine\entity\object\ItemEntity;
+use pocketmine\item\Item;
 use pocketmine\nbt\tag\CompoundTag;
-use pocketmine\nbt\tag\IntTag;
-use pocketmine\nbt\tag\StringTag;
 use pocketmine\network\mcpe\protocol\types\entity\EntityIds;
 use pocketmine\world\World;
 
@@ -24,9 +28,13 @@ class Entities
             return new Nexus(EntityDataHelper::parseLocation($nbt, $world), $nbt);
         }, ["NexusEntity"]);
 
+        EntityFactory::getInstance()->register(DynamicFloatingText::class, function (World $world, CompoundTag $nbt): DynamicFloatingText {
+            return new DynamicFloatingText(EntityDataHelper::parseLocation($nbt, $world), $nbt);
+        }, ["DynamicFloatingText"]);
+
         EntityFactory::getInstance()->register(DefaultFloatingText::class, function (World $world, CompoundTag $nbt): DefaultFloatingText {
             return new DefaultFloatingText(EntityDataHelper::parseLocation($nbt, $world), $nbt);
-        }, ["FloatingText"]);
+        }, ["DefaultFloatingText"]);
 
         EntityFactory::getInstance()->register(EnderPearl::class, function (World $world, CompoundTag $nbt): EnderPearl {
             return new EnderPearl(EntityDataHelper::parseLocation($nbt, $world), null, $nbt);
@@ -43,6 +51,16 @@ class Entities
         EntityFactory::getInstance()->register(SpawnerEntity::class, function (World $world, CompoundTag $nbt): SpawnerEntity {
             return new SpawnerEntity(EntityDataHelper::parseLocation($nbt, $world), $nbt);
         }, ["SpawnerEntity"]);
+
+        EntityFactory::getInstance()->register(Box::class, function (World $world, CompoundTag $nbt): Box {
+            $itemTag = $nbt->getCompoundTag(ItemEntity::TAG_ITEM);
+            $item = Item::nbtDeserialize($itemTag);
+
+            if ($itemTag === null) throw new SavedDataLoadingException("Expected \"" . ItemEntity::TAG_ITEM . "\" NBT tag not found");
+            if ($item->isNull()) throw new SavedDataLoadingException("Item is invalid");
+
+            return new Box(EntityDataHelper::parseLocation($nbt, $world), $item, $nbt);
+        }, ["Box"]);
 
         new Effects();
     }

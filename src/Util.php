@@ -2,6 +2,8 @@
 
 namespace Faction;
 
+use Faction\command\player\XpBottle;
+use Faction\command\util\money\Money;
 use Faction\handler\Cache;
 use Faction\handler\Faction;
 use Faction\handler\Rank;
@@ -11,11 +13,13 @@ use pocketmine\color\Color;
 use pocketmine\command\CommandSender;
 use pocketmine\console\ConsoleCommandSender;
 use pocketmine\data\bedrock\EffectIdMap;
+use pocketmine\data\bedrock\EnchantmentIdMap;
 use pocketmine\data\java\GameModeIdMap;
 use pocketmine\entity\effect\EffectInstance;
 use pocketmine\entity\effect\VanillaEffects;
 use pocketmine\inventory\Inventory;
 use pocketmine\item\Armor;
+use pocketmine\item\enchantment\EnchantmentInstance;
 use pocketmine\item\Item;
 use pocketmine\item\StringToItemParser;
 use pocketmine\item\VanillaItems;
@@ -41,7 +45,7 @@ use Symfony\Component\Filesystem\Path;
 
 class Util
 {
-    const PREFIX = "§c[§f§l!!!§r§c] §f";
+    const PREFIX = "§c[§l§f!§r§c] §f";
 
     const ARROW = "§l§c» §r§f";
     const IARROW = " §l§c«";
@@ -194,6 +198,10 @@ class Util
             Cache::$borderPlayers[$player] = true;
         }
 
+        if ($data["faction_map"]) {
+            Cache::$factionMapPlayers[$player] = true;
+        }
+
         if ($data["scoreboard"]) {
             Cache::$scoreboardPlayers[$player] = true;
             ScoreFactory::updateScoreboard($player);
@@ -204,7 +212,7 @@ class Util
         }
 
         foreach ($player->getArmorInventory()->getContents() as $item) {
-            ExtraVanillaItems::getItem($item)->addEffects($player->getArmorInventory());
+            ExtraVanillaItems::getItem($item)->addEffects($player->getArmorInventory(), $item);
         }
     }
 
@@ -351,13 +359,22 @@ class Util
         $player->getInventory()->addItem($item);
     }
 
-    public static function getTpTime(Player $player): int
+    public static function getTpTime(Player $player, string $type): int
     {
         $session = Session::get($player);
 
-        if (!$player->isAlive() || $player->isCreative() || $session->data["staff_mod"][0] || $player->getWorld() !== Main::getInstance()->getServer()->getWorldManager()->getDefaultWorld() || self::insideZone($player->getPosition(), "spawn")) {
+        if (
+            !$player->isAlive() ||
+            $player->isCreative() ||
+            $session->data["staff_mod"][0] ||
+            $player->getWorld() !== Main::getInstance()->getServer()->getWorldManager()->getDefaultWorld()
+        ) {
             return -1;
         } else {
+            if (self::insideZone($player->getPosition(), "spawn") && $type !== "tpa") {
+                return -1;
+            }
+
             $rank = Rank::getEqualRankBySession($session);
             return Rank::getRankValue($rank, "teleportation");
         }
@@ -601,5 +618,43 @@ class Util
                 $player->teleport($position, 180, -90);
             }
         }), $delay);
+    }
+
+
+    // item:itemName:count:customName:enchantId1,enchantLevel1;enchantId2,enchantLevel2
+    public static function parseItem(string $data): Item
+    {
+        $data = explode(":", $data);
+        $type = $data[0];
+
+        switch ($type) {
+            case "xp":
+                return XpBottle::createXpBottle(intval($data[1]) ?? 1);
+            case "money":
+                return Money::createPaperMoney(intval($data[1]) ?? 1);
+            default:
+                $item = StringToItemParser::getInstance()->parse($data[1]) ?? VanillaItems::AIR();
+                $item = $item->setCount(intval($data[2] ?? 1));
+
+                if (($data[3] ?? "") !== "") {
+                    $item = $item->setCustomName($data[3]);
+                }
+
+                $enchants = $data[4] ?? "";
+
+                if ($enchants !== "") {
+                    foreach (explode(";", $enchants) as $enchant) {
+                        $enchant = explode(",", $enchant);
+
+                        $enchant = new EnchantmentInstance(
+                            EnchantmentIdMap::getInstance()->fromId(intval($enchant[0] ?? 0)),
+                            intval($enchant[1] ?? 1)
+                        );
+
+                        $item = $item->addEnchantment($enchant);
+                    }
+                }
+                return $item;
+        }
     }
 }

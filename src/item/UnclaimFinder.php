@@ -18,8 +18,8 @@ class UnclaimFinder extends Durable
 
         $this->setCooldown($player, 1);
 
-        $xMax = $player->getPosition()->getX() + 32;
-        $zMax = $player->getPosition()->getZ() + 32;
+        $xMax = $player->getPosition()->getFloorX() + 32;
+        $zMax = $player->getPosition()->getFloorZ() + 32;
 
         $percentage = 0;
 

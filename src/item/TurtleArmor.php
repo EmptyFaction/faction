@@ -3,6 +3,7 @@
 namespace Faction\item;
 
 use pocketmine\entity\effect\Effect;
+use pocketmine\item\Item as PmItem;
 
 class TurtleArmor extends Armor
 {
@@ -11,7 +12,7 @@ class TurtleArmor extends Armor
         parent::__construct($maxDurability, $defensePoints);
     }
 
-    public function getEffects(): array
+    public function getEffects(PmItem $item): array
     {
         return [[$this->effect, $this->amplifier]];
     }

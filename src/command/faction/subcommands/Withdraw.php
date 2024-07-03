@@ -42,7 +42,7 @@ class Withdraw extends FactionCommand
         Cache::$factions[$faction]["logs"][time()] = "§c" . $sender->getName() . " §fa retiré §c" . $amount . "§f$ de la banque de faction";
 
         $session->addValue("money", $amount);
-        Faction::broadcastFactionMessage($faction, "§c[§fF§c] §c" . $sender->getName() . " §fvient de retirer §c" . $amount . " §fpièces de la banque de faction");
+        Faction::broadcastFactionMessage($faction, "§c[§fF§c] §c" . $sender->getName() . " §fvient de retirer §c" . $amount . "$ §fde la banque de faction");
     }
 
     protected function prepare(): void

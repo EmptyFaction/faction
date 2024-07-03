@@ -82,7 +82,7 @@ class Kit extends BaseCommand
                 $player->sendMessage(Util::PREFIX . "Vous venez de recevoir votre kit !");
             });
             $form->setTitle("Kit");
-            $form->setContent(Util::PREFIX . "Quel kit voulez-vous prendre");
+            $form->setContent(Util::ARROW . "Quel kit voulez-vous prendre");
 
             foreach (self::getKits() as $key => $value) {
                 $name = ucfirst(strtolower($key));

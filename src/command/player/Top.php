@@ -74,8 +74,9 @@ class Top extends BaseCommand
         return match ($category) {
             "killstreak" => "Joueurs avec les plus gros §ckillstreak",
             "faction" => "Faction avec le plus de §cpowers",
+            "point" => "Joueurs ayant le plus de §cpoints",
             "death" => "Joueurs ayant le plus de §cmorts",
-            "money" => "Joueurs ayant le plus de §cpièces",
+            "money" => "Joueurs ayant le plus d'§cargent",
             "nerd" => "Joueurs ayant le plus de §cjoué",
             default => "Joueurs ayant le plus de §ckills"
         };
@@ -83,7 +84,7 @@ class Top extends BaseCommand
 
     protected function prepare(): void
     {
-        $this->registerArgument(0, new OptionArgument("categorie", ["killstreak", "kill", "money", "death", "faction", "nerd"]));
+        $this->registerArgument(0, new OptionArgument("categorie", ["killstreak", "point", "kill", "death", "money", "faction", "nerd"]));
         $this->registerArgument(1, new IntegerArgument("page", true));
     }
 }

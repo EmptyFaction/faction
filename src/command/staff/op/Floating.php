@@ -4,14 +4,17 @@ namespace Faction\command\staff\op;
 
 use CortexPE\Commando\args\OptionArgument;
 use CortexPE\Commando\BaseCommand;
-use Faction\entity\DefaultFloatingText;
+use Faction\entity\animation\DefaultFloatingText;
+use Faction\entity\animation\DynamicFloatingText;
 use Faction\handler\Cache;
 use Faction\Main;
 use Faction\Util;
 use pocketmine\command\CommandSender;
 use pocketmine\entity\Location;
+use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\permission\DefaultPermissions;
 use pocketmine\plugin\PluginBase;
+use pocketmine\world\Position;
 
 class Floating extends BaseCommand
 {
@@ -33,7 +36,22 @@ class Floating extends BaseCommand
                 foreach (Cache::$config["floatings"] as $key => $value) {
                     list ($x, $y, $z, $world) = explode(":", $key);
 
-                    $entity = new DefaultFloatingText(new Location(floatval($x), floatval($y), floatval($z), Main::getInstance()->getServer()->getWorldManager()->getWorldByName($world), 0, 0));
+                    $entity = new DynamicFloatingText(new Location(floatval($x), floatval($y), floatval($z), Main::getInstance()->getServer()->getWorldManager()->getWorldByName($world), 0, 0));
+                    $entity->spawnToAll();
+                }
+
+                foreach (Cache::$config["box"] as $name => $value) {
+                    list ($x, $y, $z) = explode(":", $value["pos"]);
+
+                    $pos = new Position(intval($x), intval($y), intval($z), Main::getInstance()->getServer()->getWorldManager()->getDefaultWorld());
+
+                    $entity = new DefaultFloatingText(
+                        Location::fromObject($pos->add(0.5, 1, 0.5), $pos->getWorld()),
+                        CompoundTag::create()
+                            ->setString("floating", $value["floating"])
+                            ->setString("type", "box_" . strtolower($name))
+                    );
+
                     $entity->spawnToAll();
                 }
 
@@ -42,8 +60,8 @@ class Floating extends BaseCommand
             case "despawn":
                 foreach (Main::getInstance()->getServer()->getWorldManager()->getWorlds() as $world) {
                     foreach ($world->getEntities() as $entity) {
-                        if ($entity instanceof DefaultFloatingText) {
-                            $entity->flagForDespawn();
+                        if ($entity instanceof DynamicFloatingText || $entity instanceof DefaultFloatingText) {
+                            $entity->close();
                         }
                     }
                 }

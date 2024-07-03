@@ -78,7 +78,7 @@ class KothTask
                         Faction::addPower($session->data["faction"], mt_rand(15, 25));
                     }
 
-                    $player->sendMessage(Util::PREFIX . "Vous venez de recevoir §c25k §fpièces car vous avez gagné l'event koth");
+                    $player->sendMessage(Util::PREFIX . "Vous venez de recevoir §c25k$ §fcar vous avez gagné l'event koth");
                 }
             }
 

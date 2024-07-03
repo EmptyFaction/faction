@@ -19,6 +19,20 @@ use pocketmine\world\Position;
 
 class Faction
 {
+    const MAP_KEY_CHARS = "\\/#?ç¬£$%=&^ABCDEFGHJKLMNOPQRSTUVWXYZÄÖÜÆØÅ1234567890abcdeghjmnopqrsuvwxyÿzäöüæøåâêîûô";
+
+    const DIRECTIONS = [
+        "N" => "N",
+        "NE" => "/",
+        "E" => "E",
+        "SE" => "\\",
+        "S" => "S",
+        "SO" => "/",
+        "O" => "O",
+        "NO" => "\\",
+        "NONE" => "+"
+    ];
+
     public static function getNextRank(string $rank): string
     {
         $ranks = array_keys(Cache::$config["faction-ranks"]);
@@ -265,6 +279,11 @@ class Faction
         $chunkX = intval(floor($x)) >> Chunk::COORD_BIT_SIZE;
         $chunkZ = intval(floor($z)) >> Chunk::COORD_BIT_SIZE;
 
+        return self::inClaimByChunk($chunkX, $chunkZ);
+    }
+
+    private static function inClaimByChunk(int $chunkX, int $chunkZ): array
+    {
         $chunk = $chunkX . ":" . $chunkZ;
 
         if (isset(Cache::$claims[$chunk])) {
@@ -280,9 +299,141 @@ class Faction
         Cache::$factions[strtolower($faction)]["ally"] = $ally;
     }
 
+    public static function getMap(Player $player): array
+    {
+        $centerChunkX = $player->getPosition()->getFloorX() >> Chunk::COORD_BIT_SIZE;
+        $centerChunkZ = $player->getPosition()->getFloorZ() >> Chunk::COORD_BIT_SIZE;
+
+        $height = 10;
+        $width = 48;
+
+        $compass = self::getAsciiCompass($player);
+        $header = "§7------------------ §c[ §7" . $centerChunkX . "§c, §7" . $centerChunkZ . " §c] §7------------------";
+
+        $map = [$header];
+
+        $legend = [];
+        $characterIndex = 0;
+        $overflown = false;
+
+        for ($dz = 0; $dz < $height; $dz++) {
+            $row = "";
+
+            for ($dx = 0; $dx < $width; $dx++) {
+                $chunkX = $centerChunkX - ($width / 2) + $dx;
+                $chunkZ = $centerChunkZ - ($height / 2) + $dz;
+
+                if ($chunkX === $centerChunkX && $chunkZ === $centerChunkZ) {
+                    $row .= "§b+";
+                    continue;
+                }
+
+                $data = self::inClaimByChunk($chunkX, $chunkZ);
+
+                if ($data[0]) {
+                    $faction = $data[1];
+
+                    if (($symbol = array_search($faction, $legend)) === false && $overflown) {
+                        $row .= "§f-§r";
+                    } else {
+                        if ($symbol === false) {
+                            $legend[($symbol = self::MAP_KEY_CHARS[$characterIndex++])] = $faction;
+                        }
+                        if ($characterIndex === strlen(self::MAP_KEY_CHARS)) {
+                            $overflown = true;
+                        }
+
+                        $row .= self::getMapColor($player, $faction) . $symbol;
+                    }
+                } else {
+                    $row .= "§7-";
+                }
+            }
+
+            if ($dz <= 2) {
+                $row = $compass[$dz] . substr($row, 3 * strlen("§b+"));
+            }
+
+            $map[] = $row;
+        }
+
+        $map[] = implode(" ", array_map(function (string $character, $faction) use ($player): string {
+            return self::getMapColor($player, $faction) . $character . " §f: " . $faction;
+        }, array_keys($legend), $legend));
+
+        if ($overflown) {
+            $map[] = "§f-§r" . "§cTrop de factions (>86) sur la carte";
+        }
+
+        return $map;
+    }
+
+    private static function getAsciiCompass(Player $player): array
+    {
+        $degrees = $player->getLocation()->getYaw();
+
+        $rows = [["NO", "N", "NE"], ["O", "NONE", "E"], ["SO", "S", "SE"]];
+        $direction = self::getDirectionsByDegrees($degrees);
+
+        return array_map(function (array $directions) use ($direction): string {
+            $row = "";
+
+            foreach ($directions as $d) {
+                $row .= ($direction === $d ? "§a" : "§c") . self::DIRECTIONS[$d];
+            }
+            return $row;
+        }, $rows);
+    }
+
+    public static function getDirectionsByDegrees(float $degrees): string
+    {
+        $degrees = (round($degrees) - 157) % 360;
+        if ($degrees < 0) $degrees += 360;
+
+        return array_keys(self::DIRECTIONS)[floor($degrees / 45)];
+    }
+
+    public static function getMapColor(Player $player, string $faction): string
+    {
+        if (!self::hasFaction($player)) {
+            return "§c";
+        }
+
+        $playerFaction = Session::get($player)->data["faction"];
+
+        if ($faction === $playerFaction) {
+            return "§a";
+        } else if (Faction::getAlly($playerFaction) === $faction) {
+            return "§e";
+        }
+
+        return "§c";
+    }
+
     public static function hasFaction(Player $player): bool
     {
         self::getFactionRank($player);
         return !is_null(Session::get($player)->data["faction"]);
+    }
+
+    public static function isFreekill(Player $victim, Player $killer): bool
+    {
+        $lastKills = Session::get($killer)->data["last_kills"];
+        $count = count($lastKills);
+
+        if ($count < 3) {
+            return false;
+        }
+
+        $lastThreeKills = array_slice($lastKills, -3);
+
+        return count(array_filter($lastThreeKills, function ($kill) use ($victim) {
+                return $kill === $victim->getName();
+            })) >= 3;
+    }
+
+    public static function addFreekill(Player $victim, Player $killer): void
+    {
+        Session::get($killer)->data["last_kills"][] = $victim->getName();
     }
 }

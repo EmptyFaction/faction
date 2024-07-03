@@ -42,7 +42,7 @@ class Deposit extends FactionCommand
         Cache::$factions[$faction]["logs"][time()] = "§c" . $sender->getName() . " §fa déposé §c" . $amount . "§f$ dans la banque de faction";
 
         $session->addValue("money", $amount, true);
-        Faction::broadcastFactionMessage($faction, "§c[§fF§c] §c" . $sender->getName() . " §fvient de déposer §c" . $amount . " §fpièces dans la banque de faction");
+        Faction::broadcastFactionMessage($faction, "§c[§fF§c] §c" . $sender->getName() . " §fvient de déposer §c" . $amount . "$ §fdans la banque de faction");
     }
 
     protected function prepare(): void

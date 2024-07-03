@@ -2,8 +2,10 @@
 
 namespace Faction\block;
 
+use Faction\block\tile\SpawnerTile;
 use pocketmine\block\Block as PmBlock;
 use pocketmine\block\MonsterSpawner as PmMonsterSpawner;
+use pocketmine\block\tile\TileFactory;
 use pocketmine\block\VanillaBlocks;
 use pocketmine\utils\CloningRegistryTrait;
 
@@ -28,8 +30,13 @@ final class ExtraVanillaBlocks
         self::addBlock(VanillaBlocks::IRON(), new Iron());
         self::addBlock(VanillaBlocks::IRON_TRAPDOOR(), new IronTrapDoor());
         self::addBlock(VanillaBlocks::OBSIDIAN(), new Obsidian());
+        self::addBlock(VanillaBlocks::TRIPWIRE_HOOK(), new Key());
+        self::addBlock(VanillaBlocks::END_PORTAL_FRAME(), new EndPortal());
         self::addBlock(VanillaBlocks::NETHER_QUARTZ_ORE(), new Luckyblock());
         self::addBlock(ExtraVanillaBlocks::MONSTER_SPAWNER(), new MonsterSpawner());
+        self::addBlock(VanillaBlocks::MELON_STEM(), new MelonStem());
+
+        TileFactory::getInstance()->register(SpawnerTile::class, ["MobSpawner", "minecraft:mob_spawner"]);
 
         new World();
     }

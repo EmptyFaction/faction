@@ -6,8 +6,8 @@ use CortexPE\Commando\args\RawStringArgument;
 use CortexPE\Commando\BaseCommand;
 use Faction\Main;
 use Faction\Session;
-use Faction\task\TeleportationTask;
 use Faction\Util;
+use Faction\task\teleportation\TeleportationTask;
 use pocketmine\command\CommandSender;
 use pocketmine\permission\DefaultPermissions;
 use pocketmine\player\Player;
@@ -55,7 +55,7 @@ class Home extends BaseCommand
             list($x, $y, $z) = explode(":", $session->data["homes"][$home]);
             $pos = new Position(intval($x), intval($y), intval($z), Main::getInstance()->getServer()->getWorldManager()->getDefaultWorld());
 
-            Main::getInstance()->getScheduler()->scheduleRepeatingTask(new TeleportationTask($sender, $pos), 20);
+            Main::getInstance()->getScheduler()->scheduleRepeatingTask(new TeleportationTask($sender, $pos, "home"), 20);
         }
     }
 

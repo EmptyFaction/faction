@@ -36,6 +36,8 @@ class ScoreFactory
             $money = Util::formatNumberWithSuffix($session->data["money"]);
             $ecoins = Util::formatNumberWithSuffix($session->data["ecoin"]);
 
+            $voteparty = Cache::$data["voteparty"] ?? 0;
+
             $lines = [
                 "§f ",
                 "§l§c" . $player->getDisplayName(),
@@ -46,7 +48,7 @@ class ScoreFactory
                 "§r ",
                 "§c§lINFOS ",
                 "  §8| §fJoueurs: §c" . count(Main::getInstance()->getServer()->getOnlinePlayers()),
-                "  §8| §fVote: §c0/0",
+                "  §8| §fVote: §c" . $voteparty . "/150",
                 "§7 ",
                 "   §7emptyfac.com   "
             ];

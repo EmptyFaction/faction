@@ -3,8 +3,8 @@
 namespace Faction\command\player;
 
 use CortexPE\Commando\BaseCommand;
-use Faction\task\repeat\PlayerTask;
 use Faction\Util;
+use Faction\task\PlayerTask;
 use pocketmine\command\CommandSender;
 use pocketmine\permission\DefaultPermissions;
 use pocketmine\plugin\PluginBase;

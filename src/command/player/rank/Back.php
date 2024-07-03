@@ -6,8 +6,8 @@ use CortexPE\Commando\BaseCommand;
 use Faction\handler\Rank;
 use Faction\Main;
 use Faction\Session;
-use Faction\task\TeleportationTask;
 use Faction\Util;
+use Faction\task\teleportation\TeleportationTask;
 use pocketmine\command\CommandSender;
 use pocketmine\permission\DefaultPermissions;
 use pocketmine\player\Player;
@@ -50,7 +50,7 @@ class Back extends BaseCommand
             $position = new Position(intval($x), intval($y), intval($z), Main::getInstance()->getServer()->getWorldManager()->getDefaultWorld());
             $session->setCooldown("back", 60 * 5);
 
-            Main::getInstance()->getScheduler()->scheduleRepeatingTask(new TeleportationTask($sender, $position), 20);
+            Main::getInstance()->getScheduler()->scheduleRepeatingTask(new TeleportationTask($sender, $position, "back"), 20);
         }
     }
 

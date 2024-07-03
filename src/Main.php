@@ -10,7 +10,7 @@ use Faction\handler\Cache;
 use Faction\handler\Rank;
 use Faction\item\ExtraVanillaItems;
 use Faction\listener\EventsListener;
-use Faction\task\repeat\PlayerTask;
+use Faction\task\PlayerTask;
 use muqsit\invmenu\InvMenuHandler;
 use pocketmine\plugin\PluginBase;
 use pocketmine\utils\SingletonTrait;
@@ -45,6 +45,11 @@ class Main extends PluginBase
 
         $this->getScheduler()->scheduleRepeatingTask(new PlayerTask(), 20);
         $this->getServer()->getPluginManager()->registerEvents(new EventsListener(), $this);
+    }
+
+    public function getFile(): string
+    {
+        return parent::getFile();
     }
 
     protected function onDisable(): void

@@ -39,16 +39,6 @@ final class SpawnerTile extends Spawner
         ), 1);
     }
 
-    public function setEntityId(string $id): void
-    {
-        $this->entityTypeId = $id;
-    }
-
-    public function getEntityId(): string
-    {
-        return $this->entityTypeId;
-    }
-
     public function canUpdate(): bool
     {
         return $this->entityTypeId !== ":" && $this->getPosition()->getWorld()->getNearestEntity($this->getPosition(), $this->requiredPlayerRange, Player::class) !== null;
@@ -153,5 +143,15 @@ final class SpawnerTile extends Spawner
         }
 
         return null;
+    }
+
+    public function getEntityId(): string
+    {
+        return $this->entityTypeId;
+    }
+
+    public function setEntityId(string $id): void
+    {
+        $this->entityTypeId = $id;
     }
 }

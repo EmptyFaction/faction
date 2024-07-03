@@ -98,7 +98,7 @@ class LastInventory extends BaseCommand
             }
 
             $form->setTitle("Inventaires");
-            $form->setContent(Util::PREFIX . "Cliquez sur le boutton de votre choix");
+            $form->setContent(Util::ARROW . "Cliquez sur le boutton de votre choix");
             $sender->sendForm($form);
         }
     }
@@ -135,7 +135,7 @@ class LastInventory extends BaseCommand
         }
 
         $form->setTitle("Inventaires");
-        $form->setContent(Util::PREFIX . "Information sur la mort du joueur " . $target . "\n\n" . $message);
+        $form->setContent(Util::ARROW . "Information sur la mort du joueur " . $target . "\n\n" . $message);
         $form->addButton("Passer à l'inventaire");
         $form->addButton("Annuler");
         $player->sendForm($form);

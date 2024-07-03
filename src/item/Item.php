@@ -1,10 +1,16 @@
 <?php
 
+/**
+ *
+ * @noinspection PhpUnused
+ * @noinspection PhpUnusedParameterInspection
+ *
+ */
+
 namespace Faction\item;
 
 use Faction\handler\trait\CooldownTrait;
 use pocketmine\entity\effect\EffectInstance;
-use pocketmine\entity\effect\VanillaEffects;
 use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\inventory\ItemDamageEvent;
 use pocketmine\event\player\PlayerInteractEvent;
@@ -95,22 +101,22 @@ class Item
         $player->broadcastSound(new ItemBreakSound());
     }
 
-    public function getEffects(): array
+    public function addEffects(ArmorInventory $inventory, PmItem $item): void
     {
-        return [];
-    }
-
-    public function addEffects(ArmorInventory $inventory): void
-    {
-        foreach ($this->getEffects() as $data) {
+        foreach ($this->getEffects($item) as $data) {
             [$effect, $amplifier] = $data;
             $inventory->getHolder()->getEffects()->add(new EffectInstance($effect, 20 * 60 * 60 * 24, $amplifier, false));
         }
     }
 
-    public function removeEffects(ArmorInventory $inventory): void
+    public function getEffects(PmItem $item): array
     {
-        foreach ($this->getEffects() as $data) {
+        return [];
+    }
+
+    public function removeEffects(ArmorInventory $inventory, PmItem $item): void
+    {
+        foreach ($this->getEffects($item) as $data) {
             [$effect,] = $data;
             $inventory->getHolder()->getEffects()->remove($effect);
         }

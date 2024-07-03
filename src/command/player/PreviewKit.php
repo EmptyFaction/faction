@@ -39,6 +39,7 @@ class PreviewKit extends BaseCommand
                 $menu->setListener(InvMenu::readonly());
 
                 foreach (Kit::getKits()[$data]["items"] as $item) {
+                    $item->getNamedTag()->setInt("menu_item", 0);
                     $menu->getInventory()->addItem($item);
                 }
 
@@ -46,7 +47,7 @@ class PreviewKit extends BaseCommand
             });
 
             $form->setTitle("Prévisualisation Kit");
-            $form->setContent(Util::PREFIX . "Quel kit voulez-vous prévisualiser");
+            $form->setContent(Util::ARROW . "Quel kit voulez-vous prévisualiser");
 
             foreach (Kit::getKits() as $key => $value) {
                 $name = ucfirst(strtolower($key));

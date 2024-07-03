@@ -56,7 +56,7 @@ class Shop extends BaseCommand
         }
 
         $form->setTitle("Boutique");
-        $form->setContent(Util::PREFIX . "Cliquez sur le boutton de votre choix");
+        $form->setContent(Util::ARROW . "Cliquez sur le boutton de votre choix");
         $player->sendForm($form);
     }
 
@@ -71,7 +71,7 @@ class Shop extends BaseCommand
         });
 
         $form->setTitle("Boutique");
-        $form->setContent(Util::PREFIX . "Cliquez sur le boutton de votre choix");
+        $form->setContent(Util::ARROW . "Cliquez sur le boutton de votre choix");
 
         $category = Cache::$config["shop"][$category];
         $items = ($category["type"] === "bourse") ? Util::getBourse() : $category["items"];
@@ -80,7 +80,7 @@ class Shop extends BaseCommand
             list($name, $itemName, $buy) = explode(":", $item);
 
             $form->addButton(
-                $name . "\nPrix: §c" . $buy . " §8pièces§c/u",
+                $name . "\nPrix: §c" . $buy . " §8\$§c/u",
                 0,
                 "textures/render/" . $itemName,
                 $item
@@ -128,7 +128,7 @@ class Shop extends BaseCommand
                 Util::addItem($player, $item);
 
                 Main::getInstance()->getLogger()->info("Le joueur " . $player->getName() . " vient d'acheter au shop " . $name . " x" . $count . " pour " . ($sell * $count));
-                $player->sendMessage(Util::PREFIX . "Vous venez d'acheter §c" . $count . " §f" . $name . " pour §c" . ($buy * $count) . " §fpièces");
+                $player->sendMessage(Util::PREFIX . "Vous venez d'acheter §c" . $count . " §f" . $name . " pour §c" . ($buy * $count) . "$");
             } else {
                 if ($count > Util::getItemCount($player, $testItem)) {
                     $player->sendMessage(Util::PREFIX . "Vous n'avez pas assez d'item dans votre inventaire");
@@ -143,7 +143,7 @@ class Shop extends BaseCommand
                 }
 
                 Main::getInstance()->getLogger()->info("Le joueur " . $player->getName() . " vient de vendre au shop " . $name . " x" . $count . " pour " . ($sell * $count));
-                $player->sendMessage(Util::PREFIX . "Vous venez de vendre §c" . $count . " §f" . $name . " pour §c" . ($sell * $count) . " §fpièces");
+                $player->sendMessage(Util::PREFIX . "Vous venez de vendre §c" . $count . " §f" . $name . " pour §c" . ($sell * $count) . "$");
             }
         });
         $form->setTitle("Boutique");

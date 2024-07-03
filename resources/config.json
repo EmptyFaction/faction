@@ -264,20 +264,26 @@
   "default-data": {
     "faction": null,
     "back": null,
+    "cosmetic": null,
     "money": 1000,
     "ecoin": 0,
     "kill": 0,
     "death": 0,
+    "point": 0,
     "killstreak": 0,
     "played_time": 0,
+    "atm": 0,
     "scoreboard": true,
     "cobblestone": true,
+    "faction_map": false,
     "faction_chat": false,
     "ally_chat": false,
     "night_vision": false,
     "coordinates": false,
     "border": false,
+    "keys": [],
     "homes": [],
+    "cosmetics": [],
     "cooldowns": [],
     "blocked": [],
     "kits": [],
@@ -286,15 +292,15 @@
     "did": [],
     "jobs": {
       "Miner": {
-        "lvl": 1,
+        "lvl": 0,
         "xp": 0
       },
       "Farmer": {
-        "lvl": 1,
+        "lvl": 0,
         "xp": 0
       },
       "Hunter": {
-        "lvl": 1,
+        "lvl": 0,
         "xp": 0
       }
     },
@@ -304,17 +310,573 @@
       null
     ]
   },
+  "cosmetics": {
+    "capes": {
+      "texture": "",
+      "calvitiedayx": {
+        "ecoin": 100,
+        "money": 2000000,
+        "texture": "",
+        "button": "Cape calvitie Dayx",
+        "description": "Une cape ou on voit la grosse calvitie de notre cher staff et gendarme dayx"
+      },
+      "maxelya": {
+        "ecoin": 100,
+        "money": 2000000,
+        "texture": "",
+        "button": "Cape Maxence X Malya",
+        "description": "La cape du face app de maxence melangé avec la tête de neuille malya"
+      }
+    }
+  },
   "saves": [
     "ip",
     "uuid",
     "did"
   ],
   "jobs": {
-    "lvls": [
-      50000,
-      50000
-    ],
-    "rewards": {
+    "Miner": {
+      "1": {
+        "reward": {
+          "name": "une bouteille d'§cxp §fde §c50 §fniveaux",
+          "items": [
+            "xp:50"
+          ]
+        },
+        "xp": 100
+      },
+      "2": {
+        "reward": {
+          "name": "une pioche en netherite §cbien §fenchanté",
+          "items": [
+            "item:netherite_pickaxe:1:15,5;17,3"
+          ]
+        },
+        "xp": 300
+      },
+      "3": {
+        "reward": {
+          "name": "§c4 §fémeraudes",
+          "items": [
+            "item:emerald:4"
+          ]
+        },
+        "xp": 500
+      },
+      "4": {
+        "reward": {
+          "name": "§c8 §fluckyblocks",
+          "items": [
+            "item:nether_quartz_ore:8"
+          ]
+        },
+        "xp": 700
+      },
+      "5": {
+        "reward": {
+          "name": "une bouteille d'§cxp §fde §c75 §fniveaux",
+          "items": [
+            "xp:75"
+          ]
+        },
+        "xp": 1000
+      },
+      "6": {
+        "reward": {
+          "name": "§c16 §fémeraudes",
+          "items": [
+            "item:emerald:16"
+          ]
+        },
+        "xp": 1500
+      },
+      "7": {
+        "reward": {
+          "name": "une tête de §cZombie",
+          "items": [
+            "item:zombie_head"
+          ]
+        },
+        "xp": 2000
+      },
+      "8": {
+        "reward": {
+          "name": "§c32 §fémeraudes",
+          "items": [
+            "item:emerald:32"
+          ]
+        },
+        "xp": 3000
+      },
+      "9": {
+        "reward": {
+          "name": "une bouteille d'§cxp §fde §c100 §fniveaux",
+          "items": [
+            "xp:100"
+          ]
+        },
+        "xp": 4000
+      },
+      "10": {
+        "reward": {
+          "name": "§c8 §fblocs d'obsidienne en émeraude",
+          "items": [
+            "item:crying_obsidian:8"
+          ]
+        },
+        "xp": 5000
+      },
+      "11": {
+        "reward": {
+          "name": "§c4 §fblocs d'émeraude",
+          "items": [
+            "item:emerald_block:4"
+          ]
+        },
+        "xp": 7500
+      },
+      "12": {
+        "reward": {
+          "name": "un §cHangGlider",
+          "items": [
+            "item:nautilus_shell"
+          ]
+        },
+        "xp": 10000
+      },
+      "13": {
+        "reward": {
+          "name": "§c16 §fluckyblocks",
+          "items": [
+            "item:nether_quartz_ore:16"
+          ]
+        },
+        "xp": 12500
+      },
+      "14": {
+        "reward": {
+          "name": "une §cFarmAxe §fen émeraude",
+          "items": [
+            "item:golden_axe"
+          ]
+        },
+        "xp": 15000
+      },
+      "15": {
+        "reward": {
+          "name": "§c25,000$",
+          "items": [
+            "money:25000"
+          ]
+        },
+        "xp": 20000
+      },
+      "16": {
+        "reward": {
+          "name": "§c16 §fblocs d'obsidienne en émeraude",
+          "items": [
+            "item:crying_obsidian:16"
+          ]
+        },
+        "xp": 30000
+      },
+      "17": {
+        "reward": {
+          "name": "une bouteille d'§cxp §fde §c200 §fniveaux",
+          "items": [
+            "xp:200"
+          ]
+        },
+        "xp": 40000
+      },
+      "18": {
+        "reward": {
+          "name": "§c16 §fblocs d'émeraude",
+          "items": [
+            "item:emerald_block:16"
+          ]
+        },
+        "xp": 50000
+      },
+      "19": {
+        "reward": {
+          "name": "§c50,000$",
+          "items": [
+            "money:50000"
+          ]
+        },
+        "xp": 60000
+      },
+      "20": {
+        "reward": {
+          "name": "une §cFarmAxe §fen rubis",
+          "items": [
+            "item:golden_pickaxe"
+          ]
+        },
+        "xp": 70000
+      }
+    },
+    "Farmer": {
+      "1": {
+        "reward": {
+          "name": "une bouteille d'§cxp §fde §c25 §fniveaux",
+          "items": [
+            "xp:25"
+          ]
+        },
+        "xp": 100
+      },
+      "2": {
+        "reward": {
+          "name": "§c16 §fsuper engrais",
+          "items": [
+            "item:rapid_fertilizer:16"
+          ]
+        },
+        "xp": 300
+      },
+      "3": {
+        "reward": {
+          "name": "une §cfourche",
+          "items": [
+            "item:golden_shovel"
+          ]
+        },
+        "xp": 500
+      },
+      "4": {
+        "reward": {
+          "name": "§c15,000$",
+          "items": [
+            "money:15000"
+          ]
+        },
+        "xp": 700
+      },
+      "5": {
+        "reward": {
+          "name": "§c32 §fsuper engrais",
+          "items": [
+            "item:rapid_fertilizer:32"
+          ]
+        },
+        "xp": 1000
+      },
+      "6": {
+        "reward": {
+          "name": "une bouteille d'§cxp §fde §c50 §fniveaux",
+          "items": [
+            "xp:50"
+          ]
+        },
+        "xp": 1500
+      },
+      "7": {
+        "reward": {
+          "name": "§c25,000$",
+          "items": [
+            "money:25000"
+          ]
+        },
+        "xp": 2000
+      },
+      "8": {
+        "reward": {
+          "name": "un §carrosoir",
+          "items": [
+            "item:golden_hoe"
+          ]
+        },
+        "xp": 3000
+      },
+      "9": {
+        "reward": {
+          "name": "§c64 §fsuper engrais",
+          "items": [
+            "item:rapid_fertilizer:64"
+          ]
+        },
+        "xp": 4000
+      },
+      "10": {
+        "reward": {
+          "name": "§c50,000$",
+          "items": [
+            "money:50000"
+          ]
+        },
+        "xp": 5000
+      },
+      "11": {
+        "reward": {
+          "name": "une bouteille d'§cxp §fde §c150 §fniveaux",
+          "items": [
+            "xp:150"
+          ]
+        },
+        "xp": 7500
+      },
+      "12": {
+        "reward": {
+          "name": "§c75,000$",
+          "items": [
+            "money:75000"
+          ]
+        },
+        "xp": 10000
+      },
+      "13": {
+        "reward": {
+          "name": "une §cpelle boostée",
+          "items": [
+            "item:iron_shovel"
+          ]
+        },
+        "xp": 12500
+      },
+      "14": {
+        "reward": {
+          "name": "§c8 §fblocs d'émeraude",
+          "items": [
+            "item:emerald_block:8"
+          ]
+        },
+        "xp": 15000
+      },
+      "15": {
+        "reward": {
+          "name": "un §clingot de rubis",
+          "items": [
+            "item:rabbit_hide"
+          ]
+        },
+        "xp": 20000
+      },
+      "16": {
+        "reward": {
+          "name": "§c100,000$",
+          "items": [
+            "money:100000"
+          ]
+        },
+        "xp": 30000
+      },
+      "17": {
+        "reward": {
+          "name": "§c16 §fblocs d'émeraude",
+          "items": [
+            "item:emerald_block:16"
+          ]
+        },
+        "xp": 40000
+      },
+      "18": {
+        "reward": {
+          "name": "2 §clingots de rubis",
+          "items": [
+            "item:rabbit_hide:2"
+          ]
+        },
+        "xp": 50000
+      },
+      "19": {
+        "reward": {
+          "name": "§c32 §fblocs d'émeraude",
+          "items": [
+            "item:emerald_block:32"
+          ]
+        },
+        "xp": 60000
+      },
+      "20": {
+        "reward": {
+          "name": "une §cFarmAxe en rubis",
+          "items": [
+            "item:golden_pickaxe"
+          ]
+        },
+        "xp": 70000
+      }
+    },
+    "Hunter": {
+      "1": {
+        "reward": {
+          "name": "§c4 §cpommes ze3ef",
+          "items": []
+        },
+        "xp": 100
+      },
+      "2": {
+        "reward": {
+          "name": "§c4 §fblocs d'émeraude",
+          "items": [
+            "item:emerald_block:4"
+          ]
+        },
+        "xp": 300
+      },
+      "3": {
+        "reward": {
+          "name": "une épée en §cémeraude",
+          "items": [
+            "item:golden_sword"
+          ]
+        },
+        "xp": 500
+      },
+      "4": {
+        "reward": {
+          "name": "§c8 §fblocs d'obsidienne en émeraude",
+          "items": [
+            "item:crying_obsidian:8"
+          ]
+        },
+        "xp": 700
+      },
+      "5": {
+        "reward": {
+          "name": "§c8 §cpommes ze3ef",
+          "items": []
+        },
+        "xp": 1000
+      },
+      "6": {
+        "reward": {
+          "name": "§c8 §fblocs d'émeraude",
+          "items": [
+            "item:emerald_block:8"
+          ]
+        },
+        "xp": 1500
+      },
+      "7": {
+        "reward": {
+          "name": "une bouteille d'§cxp §fde §c50 §fniveaux",
+          "items": [
+            "xp:50"
+          ]
+        },
+        "xp": 2000
+      },
+      "8": {
+        "reward": {
+          "name": "§c25,000$",
+          "items": [
+            "money:25000"
+          ]
+        },
+        "xp": 3000
+      },
+      "9": {
+        "reward": {
+          "name": "§c16 §fluckyblocks",
+          "items": [
+            "item:nether_quartz_ore:16"
+          ]
+        },
+        "xp": 4000
+      },
+      "10": {
+        "reward": {
+          "name": "une épée en §cémeraude",
+          "items": [
+            "item:golden_sword"
+          ]
+        },
+        "xp": 5000
+      },
+      "11": {
+        "reward": {
+          "name": "§c32 §fblocs d'obsidienne en émeraude",
+          "items": [
+            "item:crying_obsidian:32"
+          ]
+        },
+        "xp": 7500
+      },
+      "12": {
+        "reward": {
+          "name": "§c16 §cpommes ze3ef",
+          "items": []
+        },
+        "xp": 10000
+      },
+      "13": {
+        "reward": {
+          "name": "§c50,000$",
+          "items": [
+            "money:50000"
+          ]
+        },
+        "xp": 12500
+      },
+      "14": {
+        "reward": {
+          "name": "une bouteille d'§cxp §fde §c100 §fniveaux",
+          "items": [
+            "xp:100"
+          ]
+        },
+        "xp": 15000
+      },
+      "15": {
+        "reward": {
+          "name": "un §cfull émeraude",
+          "items": [
+            "item:golden_helmet",
+            "item:golden_chestplate",
+            "item:golden_leggings",
+            "item:golden_boots"
+          ]
+        },
+        "xp": 20000
+      },
+      "16": {
+        "reward": {
+          "name": "§c16 §fblocs d'émeraude",
+          "items": [
+            "item:emerald_block:16"
+          ]
+        },
+        "xp": 30000
+      },
+      "17": {
+        "reward": {
+          "name": "§c32 §fluckyblocks",
+          "items": [
+            "item:nether_quartz_ore:32"
+          ]
+        },
+        "xp": 40000
+      },
+      "18": {
+        "reward": {
+          "name": "une §cpomme enchantée",
+          "items": [
+            "item:enchanted_golden_apple"
+          ]
+        },
+        "xp": 50000
+      },
+      "19": {
+        "reward": {
+          "name": "un §cgénérateur de Zombie",
+          "items": [
+            "item:monster_spawner_zombie"
+          ]
+        },
+        "xp": 60000
+      },
+      "20": {
+        "reward": {
+          "name": "un §clingot de rubis",
+          "items": [
+            "item:rabbit_hide"
+          ]
+        },
+        "xp": 70000
+      }
     }
   },
   "zones": {
@@ -322,19 +884,19 @@
     "warzone": "511:-999:511:-512:999:-512:map",
     "koth": "-132:65.5:24:-137:70:29:map",
     "outpost": "67:65.5:136:73:70:142:map",
-    "money-zone": "1:64:83:-1:69:85:map"
+    "money-zone": "1:73:-73:-1:80:-75:map"
   },
   "floatings": {
     "70.5:67:139.5:map": "outpost",
     "-134:68:27:map": "koth",
-    "0.5:66.5:84.5:map": "money-zone"
+    "0.5:75.5:-73.5:map": "money-zone"
   },
+  "nexus": "-54.5:67:145.5",
   "messages": [
     "Rejoignez le discord du serveur: §cdiscord.gg/emptyfaction",
     "Si vous avez une §cquestion §fou un §cproblème§f, contactez un membre du §cstaff",
     "EmptyFaction §c-§f 2024"
   ],
-  "nexus": "-54.5:67:145.5",
   "permissions": {
     "delete": "Supprimer la faction §c(Risqué)",
     "leader": "Promouvoir chef un membre §c(Risqué)",
@@ -547,53 +1109,6 @@
     "FallDistance",
     "Air"
   ],
-  "directions": [
-    {
-      "min": 0,
-      "max": 22.5,
-      "direction": "O"
-    },
-    {
-      "min": 22.5,
-      "max": 67.5,
-      "direction": "NO"
-    },
-    {
-      "min": 67.5,
-      "max": 112.5,
-      "direction": "N"
-    },
-    {
-      "min": 112.5,
-      "max": 157.5,
-      "direction": "NE"
-    },
-    {
-      "min": 157.5,
-      "max": 202.5,
-      "direction": "E"
-    },
-    {
-      "min": 202.5,
-      "max": 247.5,
-      "direction": "SE"
-    },
-    {
-      "min": 247.5,
-      "max": 292.5,
-      "direction": "S"
-    },
-    {
-      "min": 292.5,
-      "max": 337.5,
-      "direction": "SO"
-    },
-    {
-      "min": 337.5,
-      "max": 360,
-      "direction": "O"
-    }
-  ],
   "crafts": {
     "remove": [
     ],
@@ -606,8 +1121,84 @@
       "width": 0.6,
       "name": "Zombie",
       "french": "Zombie",
-      "drops": [],
-      "xp": 5
+      "drops": [
+        "1,2:rotten_flesh:1,2",
+        "1,500:zombie_head:1"
+      ],
+      "xp": 1
+    },
+    "minecraft:creeper": {
+      "height": 1.6,
+      "width": 0.6,
+      "name": "Creeper",
+      "french": "Creeper",
+      "drops": [
+        "1,3:gunpowder:1",
+        "1,400:creeper_spawn_egg:1",
+        "1,500:creeper_head:1"
+      ],
+      "xp": 1
+    },
+    "minecraft:enderman": {
+      "height": 2.8,
+      "width": 0.6,
+      "name": "Enderman",
+      "french": "Enderman",
+      "drops": [
+        "1,2:ender_pearl:1",
+        "1,500:dragon_head:1"
+      ],
+      "xp": 1
+    },
+    "minecraft:wither_skeleton": {
+      "height": 2,
+      "width": 0.7,
+      "name": "Whither Skeleton",
+      "french": "Wither Squelette",
+      "drops": [
+        "0,1:coal:1",
+        "0,2:bone:1",
+        "1,500:wither_skeleton_skull:1"
+      ],
+      "xp": 1
+    },
+    "minecraft:piglin": {
+      "height": 2,
+      "width": 0.6,
+      "name": "Piglin",
+      "french": "Piglin",
+      "drops": [
+        "1,50:emerald:1",
+        "1,50:gold_ingot:1",
+        "1,20:obsidian:1,3",
+        "1,20:nether_quartz_ore:1",
+        "1,500:piglin_head:1"
+      ],
+      "xp": 4
+    }
+  },
+  "box": {
+    "Vote": {
+      "pos": "0:77:-24",
+      "floating": "§b§lBOX VOTE\n§r§fRareté: §6*",
+      "particle": "",
+      "rewards": [
+        [
+          "1",
+          "Une pierre",
+          "item:stone:1"
+        ],
+        [
+          "1",
+          "§c50,000$",
+          "money:50000"
+        ],
+        [
+          "1",
+          "§c30 niveaux",
+          "xp:30"
+        ]
+      ]
     }
   }
 }

@@ -1,12 +1,16 @@
 <?php
 
-namespace Faction\task\repeat;
+namespace Faction\task;
 
 use Faction\command\staff\op\Clearlag;
 use Faction\handler\Cache;
+use Faction\handler\Faction;
 use Faction\handler\ScoreFactory;
 use Faction\Main;
 use Faction\Session;
+use Faction\task\repeat\KothTask;
+use Faction\task\repeat\MoneyZoneTask;
+use Faction\task\repeat\OutpostTask;
 use Faction\Util;
 use pocketmine\math\Vector3;
 use pocketmine\player\Player;
@@ -17,13 +21,22 @@ class PlayerTask extends Task
 {
     /* @var WeakMap<Player, Vector3> */
     private static WeakMap $lastPosition;
-
-    private int $tick = 0;
     private static int $clearlag = 301;
+    private int $tick = 0;
 
     public function __construct()
     {
         self::$lastPosition = new WeakMap();
+    }
+
+    public static function getNextClearlag(): int
+    {
+        return self::$clearlag;
+    }
+
+    public static function resetClearlag(): void
+    {
+        self::$clearlag = 301;
     }
 
     public function onRun(): void
@@ -87,6 +100,12 @@ class PlayerTask extends Task
             }
         }
 
+        foreach (Cache::$factionMapPlayers as $player => $ignore) {
+            if ($player->isConnected() && $this->tick % 3 == 0) {
+                $player->sendMessage(implode("\n", Faction::getMap($player)));
+            }
+        }
+
         foreach (Cache::$scoreboardPlayers as $player => $ignore) {
             if ($player->isConnected() && $this->tick % 45 == 0) {
                 ScoreFactory::updateScoreboard($player);
@@ -114,15 +133,5 @@ class PlayerTask extends Task
                 }
             }
         }
-    }
-
-    public static function getNextClearlag(): int
-    {
-        return self::$clearlag;
-    }
-
-    public static function resetClearlag(): void
-    {
-        self::$clearlag = 301;
     }
 }

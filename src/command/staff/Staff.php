@@ -67,14 +67,14 @@ class Staff extends BaseCommand
         $player->getInventory()->clearAll();
         $player->getXpManager()->setXpLevel(0);
 
-        $player->getInventory()->setItem(0, VanillaItems::BANNER()->setColor(DyeColor::LIGHT_GRAY())->setCustomName("§r" . Util::PREFIX . "Spectateur §c§l«"));
-        $player->getInventory()->setItem(4, VanillaItems::SPIDER_EYE()->setCustomName("§r" . Util::PREFIX . "Random Tp §c§l«"));
-        $player->getInventory()->setItem(5, VanillaItems::BLAZE_ROD()->setCustomName("§r" . Util::PREFIX . "Freeze §c§l«"));
+        $player->getInventory()->setItem(0, VanillaItems::BANNER()->setColor(DyeColor::LIGHT_GRAY())->setCustomName("§r" . Util::ARROW . "Spectateur" . Util::IARROW));
+        $player->getInventory()->setItem(4, VanillaItems::SPIDER_EYE()->setCustomName("§r" . Util::ARROW . "Random Tp" . Util::IARROW));
+        $player->getInventory()->setItem(5, VanillaItems::BLAZE_ROD()->setCustomName("§r" . Util::ARROW . "Freeze" . Util::IARROW));
 
         if (in_array($player->getName(), Vanish::$vanish)) {
-            $player->getInventory()->setItem(1, VanillaItems::DYE()->setColor(DyeColor::GREEN())->setCustomName("§r" . Util::PREFIX . "Vanish §c§l«"));
+            $player->getInventory()->setItem(1, VanillaItems::DYE()->setColor(DyeColor::GREEN())->setCustomName("§r" . Util::ARROW . "Vanish" . Util::IARROW));
         } else {
-            $player->getInventory()->setItem(1, VanillaItems::DYE()->setColor(DyeColor::LIGHT_GRAY())->setCustomName("§r" . Util::PREFIX . "Vanish §c§l«"));
+            $player->getInventory()->setItem(1, VanillaItems::DYE()->setColor(DyeColor::LIGHT_GRAY())->setCustomName("§r" . Util::ARROW . "Vanish" . Util::IARROW));
         }
     }
 

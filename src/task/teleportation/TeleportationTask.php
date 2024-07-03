@@ -1,6 +1,6 @@
 <?php
 
-namespace Faction\task;
+namespace Faction\task\teleportation;
 
 use Faction\Main;
 use Faction\Session;
@@ -19,12 +19,13 @@ class TeleportationTask extends Task
     public function __construct(
         private readonly Player   $player,
         private readonly Position $position,
+        string                    $type,
         private readonly int      $invincibility = 0,
         private readonly bool     $rtp = false
     )
     {
         $session = Session::get($player);
-        $time = Util::getTpTime($player);
+        $time = Util::getTpTime($player, $type);
 
         $player->sendMessage(Util::PREFIX . "Vous allez être téléporté dans §c" . max($time, 0) . " §fseconde(s), veuillez ne pas bouger");
         $player->getEffects()->add(new EffectInstance(VanillaEffects::BLINDNESS(), 20 * ($time + 1), 1, false));

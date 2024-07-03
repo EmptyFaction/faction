@@ -3,7 +3,6 @@
 namespace Faction\block\tile;
 
 use pocketmine\block\tile\Spawnable;
-use pocketmine\math\Vector3;
 use pocketmine\nbt\tag\CompoundTag;
 
 abstract class Spawner extends Spawnable
@@ -48,6 +47,11 @@ abstract class Spawner extends Spawnable
 
     abstract public function onUpdate(): bool;
 
+    public function setRandomSpawnDelay(): void
+    {
+        $this->spawnDelay = mt_rand($this->minSpawnDelay, $this->maxSpawnDelay);
+    }
+
     protected function writeSaveData(CompoundTag $nbt): void
     {
         $nbt->setString(self::TAG_ENTITY_TYPE_ID, $this->entityTypeId);
@@ -57,11 +61,6 @@ abstract class Spawner extends Spawnable
         $nbt->setShort(self::TAG_SPAWN_RANGE, $this->spawnRange);
         $nbt->setShort(self::TAG_SPAWN_ATTEMPTS, $this->spawnAttempts);
         $nbt->setShort(self::TAG_REQUIRED_PLAYER_RANGE, $this->requiredPlayerRange);
-    }
-
-    public function setRandomSpawnDelay(): void
-    {
-        $this->spawnDelay = mt_rand($this->minSpawnDelay, $this->maxSpawnDelay);
     }
 
     protected function addAdditionalSpawnData(CompoundTag $nbt): void

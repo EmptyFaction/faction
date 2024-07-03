@@ -31,13 +31,11 @@ use function sqrt;
 
 class Explosion
 {
-    private int $rays = 16;
     public World $world;
-
     /** @var Block[] */
     public array $affectedBlocks = [];
     public float $stepLen = 0.3;
-
+    private int $rays = 16;
     private SubChunkExplorer $subChunkExplorer;
 
     public function __construct(
@@ -174,11 +172,11 @@ class Explosion
                 $damage = (int)((($impact * $impact + $impact) / 2) * 8 * $explosionSize + 1);
 
                 if ($this->what instanceof Entity) {
-                    $ev = new EntityDamageByEntityEvent($this->what, $entity, EntityDamageEvent::CAUSE_ENTITY_EXPLOSION, $damage/2);
+                    $ev = new EntityDamageByEntityEvent($this->what, $entity, EntityDamageEvent::CAUSE_ENTITY_EXPLOSION, $damage / 2);
                 } elseif ($this->what instanceof Block) {
-                    $ev = new EntityDamageByBlockEvent($this->what, $entity, EntityDamageEvent::CAUSE_BLOCK_EXPLOSION, $damage/2);
+                    $ev = new EntityDamageByBlockEvent($this->what, $entity, EntityDamageEvent::CAUSE_BLOCK_EXPLOSION, $damage / 2);
                 } else {
-                    $ev = new EntityDamageEvent($entity, EntityDamageEvent::CAUSE_BLOCK_EXPLOSION, $damage/2);
+                    $ev = new EntityDamageEvent($entity, EntityDamageEvent::CAUSE_BLOCK_EXPLOSION, $damage / 2);
                 }
 
                 $entity->attack($ev);

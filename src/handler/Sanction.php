@@ -23,7 +23,7 @@ class Sanction
             $player->chat("/" . $data . " \"" . $target . "\"");
         });
         $form->setTitle("Sanction");
-        $form->setContent(Util::PREFIX . "Cliquez sur le bouton de votre choix");
+        $form->setContent(Util::ARROW . "Cliquez sur le bouton de votre choix");
         $form->addButton("Ban", -1, "", "ban");
         $form->addButton("Kick", -1, "", "kick");
         $form->addButton("Mute", -1, "", "mute");
@@ -51,7 +51,7 @@ class Sanction
         }
 
         $form->setTitle(ucfirst($type));
-        $form->setContent(Util::PREFIX . "Cliquez sur le bouton de votre choix");
+        $form->setContent(Util::ARROW . "Cliquez sur le bouton de votre choix");
         $form->addButton("Autre", -1, "", "other");
         $player->sendForm($form);
     }
@@ -222,7 +222,7 @@ class Sanction
         }
 
         $form->setTitle(ucfirst($type));
-        $form->setContent(Util::PREFIX . "Cliquez sur le bouton de votre choix");
+        $form->setContent(Util::ARROW . "Cliquez sur le bouton de votre choix");
         $player->sendForm($form);
     }
 }

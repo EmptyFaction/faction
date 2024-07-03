@@ -2,13 +2,26 @@
 
 namespace Faction\block;
 
+use Faction\item\BoostedShovel;
 use Faction\item\Durable as CustomDurable;
+use Faction\item\ExtraVanillaItems;
+use Faction\item\FarmAxe;
+use Faction\item\Fork;
+use Faction\item\Sword;
+use Faction\item\UnclaimFinder;
+use Faction\item\WateringCan;
 use Faction\Util;
 use jojoe77777\FormAPI\SimpleForm;
 use pocketmine\event\player\PlayerInteractEvent;
+use pocketmine\item\Armor;
 use pocketmine\item\Durable;
+use pocketmine\item\Item;
+use pocketmine\item\TieredTool;
+use pocketmine\item\ToolTier;
+use pocketmine\item\VanillaArmorMaterials;
 use pocketmine\item\VanillaItems;
 use pocketmine\player\Player;
+use pocketmine\world\sound\AnvilUseSound;
 
 class Anvil extends Durability
 {
@@ -37,23 +50,9 @@ class Anvil extends Durability
             return;
         }
 
+        $price = self::getRepairPrice($item);
+
         $form = new SimpleForm(function (Player $player, mixed $data) {
-            if (!is_int($data)) {
-                return;
-            }
-
-            self::confirmationForm($player, $data);
-        });
-        $form->setTitle("Enclume");
-        $form->setContent(Util::PREFIX . "Cliquez sur le boutton de votre choix");
-        $form->addButton("Réparer avec\n§c15 levels");
-        $form->addButton("Réparer avec\n§c10 émeraudes");
-        $player->sendForm($form);
-    }
-
-    private function confirmationForm(Player $player, int $category): void
-    {
-        $form = new SimpleForm(function (Player $player, mixed $data) use ($category) {
             $item = $player->getInventory()->getItemInHand();
 
             if (!is_string($data) || $data != "yes") {
@@ -63,24 +62,18 @@ class Anvil extends Durability
                 return;
             }
 
-            switch ($category) {
-                case 0:
-                    if (15 > $player->getXpManager()->getXpLevel()) {
-                        $player->sendMessage(Util::PREFIX . "Vous n'avez pas assez de niveaux pour réparé votre item");
-                        return;
-                    }
+            $price = self::getRepairPrice($item);
 
-                    $player->getXpManager()->setXpLevel($player->getXpManager()->getXpLevel() - 15);
-                    break;
-                case 1:
-                    if (10 > Util::getItemCount($player, VanillaItems::EMERALD())) {
-                        $player->sendMessage(Util::PREFIX . "Vous n'avez pas assez d'émeraudes pour réparé votre item");
-                        return;
-                    }
-
-                    $player->getInventory()->removeItem(VanillaItems::EMERALD()->setCount(10));
-                    break;
+            if ($price > $player->getXpManager()->getXpLevel()) {
+                $player->sendMessage(Util::PREFIX . "Vous n'avez pas assez de niveaux pour réparer votre item");
+                return;
+            } else if ($price > Util::getItemCount($player, VanillaItems::LAPIS_LAZULI())) {
+                $player->sendMessage(Util::PREFIX . "Vous n'avez pas assez de lapis-lazuli pour réparer votre item");
+                return;
             }
+
+            $player->getXpManager()->setXpLevel($player->getXpManager()->getXpLevel() - $price);
+            $player->getInventory()->removeItem(VanillaItems::LAPIS_LAZULI()->setCount($price));
 
             $item->setDamage(0);
 
@@ -90,12 +83,41 @@ class Anvil extends Durability
 
             $player->getInventory()->setItemInHand($item);
             $player->sendMessage(Util::PREFIX . "Vous venez de réparer l'item dans votre main");
+
+            $player->broadcastSound(new AnvilUseSound());
         });
         $form->setTitle("Enclume");
-        $form->setContent(Util::PREFIX . "Êtes vous sur de réparer l'item dans votre main ?");
+        $form->setContent(Util::ARROW . "Voulez vous réparer l'item dans votre main ?\n\nLe prix sera de §c" . $price . " §fniveaux ainsi que §c" . $price . " §flapis-lazuli !");
         $form->addButton("Oui", -1, "", "yes");
         $form->addButton("Non", -1, "", "no");
         $player->sendForm($form);
+    }
+
+    public static function getRepairPrice(Item $item): int
+    {
+        $count = $item->getCount();
+        $extraItem = ExtraVanillaItems::getItem($item);
+
+        if ($item instanceof Armor) {
+            return match ($item->getMaterial()) {
+                    VanillaArmorMaterials::NETHERITE() => 30,
+                    VanillaArmorMaterials::GOLD() => 20, // EMERALD
+                    default => 10
+                } * $count;
+        } else if ($extraItem instanceof FarmAxe || $extraItem instanceof UnclaimFinder || $extraItem instanceof Fork) {
+            return 30 * $count;
+        } else if ($extraItem instanceof BoostedShovel || $extraItem instanceof WateringCan) {
+            return 20 * $count;
+        } else if ($extraItem instanceof Sword) {
+            return match ($item->getTypeId()) {
+                    VanillaItems::GOLDEN_SWORD()->getTypeId() => 20,
+                    default => 30
+                } * $count;
+        } else if ($item instanceof TieredTool && $item->getTier() === ToolTier::NETHERITE()) {
+            return 30 * $count;
+        }
+
+        return 10 * $count;
     }
 
     public function getDurability(): int

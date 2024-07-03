@@ -1,6 +1,6 @@
 <?php /** @noinspection PhpUnused */
 
-namespace Faction\entity;
+namespace Faction\entity\animation;
 
 use pocketmine\entity\EntitySizeInfo;
 use pocketmine\entity\Living;

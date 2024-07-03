@@ -24,7 +24,7 @@ class WateringCan extends Durable
             return false;
         }
 
-        // Ajouter un rayon
+        // TODO Ajouter un rayon
         $this->setCooldown($player, 0.1);
 
         if ($block instanceof Crops || $block instanceof NetherWartPlant) {

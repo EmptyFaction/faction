@@ -33,12 +33,6 @@ class Creeper extends Living
         return "Creeper";
     }
 
-    protected function initEntity(CompoundTag $nbt, float $time = 3): void
-    {
-        parent::initEntity($nbt);
-        $this->makeExplode($time);
-    }
-
     public function getDrops(): array
     {
         return [];
@@ -65,13 +59,6 @@ class Creeper extends Living
         return parent::onUpdate($currentTick);
     }
 
-    public function attack(EntityDamageEvent $source): void
-    {
-        if ($source->getCause() === $source::CAUSE_ENTITY_EXPLOSION) {
-            $source->cancel();
-        }
-    }
-
     private function explode(): void
     {
         $ev = new EntityPreExplodeEvent($this, 3);
@@ -90,6 +77,13 @@ class Creeper extends Living
         $this->close();
     }
 
+    public function attack(EntityDamageEvent $source): void
+    {
+        if ($source->getCause() === $source::CAUSE_ENTITY_EXPLOSION) {
+            $source->cancel();
+        }
+    }
+
     public function onInteract(Player $player, Vector3 $clickPos): bool
     {
         $item = $player->getInventory()->getItemInHand();
@@ -104,6 +98,12 @@ class Creeper extends Living
             return true;
         }
         return false;
+    }
+
+    protected function initEntity(CompoundTag $nbt, float $time = 3): void
+    {
+        parent::initEntity($nbt);
+        $this->makeExplode($time);
     }
 
     private function makeExplode(float $time = 3.00): void

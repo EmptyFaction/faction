@@ -4,7 +4,6 @@ namespace Faction\command\player;
 
 use CortexPE\Commando\args\IntegerArgument;
 use CortexPE\Commando\BaseCommand;
-use Faction\item\Item;
 use Faction\Main;
 use Faction\Session;
 use Faction\Util;
@@ -30,7 +29,7 @@ class XpBottle extends BaseCommand
     public function onRun(CommandSender $sender, string $aliasUsed, array $args): void
     {
         if ($sender instanceof Player) {
-            $amount = intval($args["montant"]) ?? $sender->getXpManager()->getXpLevel();
+            $amount = $args["montant"] ?? $sender->getXpManager()->getXpLevel();
             $session = Session::get($sender);
 
             if ($amount < 1 || $amount > 1000) {

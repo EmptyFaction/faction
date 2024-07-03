@@ -16,10 +16,11 @@ class RandomTp extends BaseCommand
     {
         parent::__construct(
             $plugin,
-            "randomtp",
+            "prandomtp",
             "Se téléporte à un joueur au hasard connecté"
         );
 
+        $this->setAliases(["prtp"]);
         $this->setPermissions([Rank::GROUP_STAFF]);
     }
 
