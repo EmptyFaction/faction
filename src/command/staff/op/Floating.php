@@ -4,6 +4,7 @@ namespace Faction\command\staff\op;
 
 use CortexPE\Commando\args\OptionArgument;
 use CortexPE\Commando\BaseCommand;
+use Faction\entity\animation\Box;
 use Faction\entity\animation\DefaultFloatingText;
 use Faction\entity\animation\DynamicFloatingText;
 use Faction\handler\Cache;
@@ -41,15 +42,24 @@ class Floating extends BaseCommand
                 }
 
                 foreach (Cache::$config["box"] as $name => $value) {
-                    list ($x, $y, $z) = explode(":", $value["pos"]);
+                    [$x, $y, $z, $yaw] = explode(":", $value["pos"]);
 
                     $pos = new Position(intval($x), intval($y), intval($z), Main::getInstance()->getServer()->getWorldManager()->getDefaultWorld());
 
                     $entity = new DefaultFloatingText(
-                        Location::fromObject($pos->add(0.5, 1, 0.5), $pos->getWorld()),
+                        Location::fromObject($pos->add(0.5, 1.2, 0.5), $pos->getWorld()),
                         CompoundTag::create()
                             ->setString("floating", $value["floating"])
                             ->setString("type", "box_" . strtolower($name))
+                    );
+
+                    $entity->spawnToAll();
+
+                    $entity = new Box(
+                        Location::fromObject($pos->add(0.5, 0, 0.5), $pos->getWorld(), intval($yaw)),
+                        CompoundTag::create()
+                            ->setString("id", "nitro:box_" . $value["entity"])
+                            ->setString("pos", $value["pos"])
                     );
 
                     $entity->spawnToAll();
@@ -60,7 +70,7 @@ class Floating extends BaseCommand
             case "despawn":
                 foreach (Main::getInstance()->getServer()->getWorldManager()->getWorlds() as $world) {
                     foreach ($world->getEntities() as $entity) {
-                        if ($entity instanceof DynamicFloatingText || $entity instanceof DefaultFloatingText) {
+                        if ($entity instanceof DynamicFloatingText || $entity instanceof DefaultFloatingText || $entity instanceof Box) {
                             $entity->close();
                         }
                     }

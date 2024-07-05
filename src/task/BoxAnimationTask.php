@@ -2,7 +2,7 @@
 
 namespace Faction\task;
 
-use Faction\entity\animation\Box as Entity;
+use Faction\entity\animation\BoxItem as Entity;
 use Faction\entity\animation\DefaultFloatingText;
 use Faction\handler\Box as Api;
 use Faction\Main;
@@ -13,7 +13,6 @@ use pocketmine\entity\Location;
 use pocketmine\math\Vector3;
 use pocketmine\player\Player;
 use pocketmine\scheduler\Task;
-use pocketmine\world\particle\FlameParticle;
 use pocketmine\world\sound\BlazeShootSound;
 use pocketmine\world\sound\ClickSound;
 use pocketmine\world\sound\XpCollectSound;
@@ -100,20 +99,6 @@ class BoxAnimationTask extends Task
         }
     }
 
-    public function getItem(): array
-    {
-        $data = Api::getBoxData($this->block);
-        $items = Api::getItems($data["name"]);
-
-        $randomKey = array_rand($items);
-        $randomItem = $items[$randomKey];
-
-        return [
-            "name" => Util::ARROW . ucfirst($randomKey) . Util::IARROW,
-            "item" => $randomItem
-        ];
-    }
-
     public function updateFloating(bool $spawn): void
     {
         $data = Api::getBoxData($this->block);
@@ -131,6 +116,20 @@ class BoxAnimationTask extends Task
                 $entity->despawnFrom($this->player);
             }
         }
+    }
+
+    public function getItem(): array
+    {
+        $data = Api::getBoxData($this->block);
+        $items = Api::getItems($data["name"]);
+
+        $randomKey = array_rand($items);
+        $randomItem = $items[$randomKey];
+
+        return [
+            "name" => Util::ARROW . ucfirst($randomKey) . Util::IARROW,
+            "item" => $randomItem
+        ];
     }
 
     public function chooseRandomItem(): array

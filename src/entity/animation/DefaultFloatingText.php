@@ -25,6 +25,14 @@ class DefaultFloatingText extends FloatingText
         return $this->type;
     }
 
+    public function saveNBT(): CompoundTag
+    {
+        $nbt = parent::saveNBT();
+        $nbt->setString("floating", $this->content);
+        $nbt->setString("type", $this->type);
+        return $nbt;
+    }
+
     protected function getPeriod(): ?int
     {
         return $this->period;
@@ -38,13 +46,5 @@ class DefaultFloatingText extends FloatingText
 
         $this->period = null;
         return $this->content;
-    }
-
-    public function saveNBT(): CompoundTag
-    {
-        $nbt = parent::saveNBT();
-        $nbt->setString("floating", $this->content);
-        $nbt->setString("type", $this->type);
-        return $nbt;
     }
 }

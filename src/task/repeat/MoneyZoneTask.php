@@ -2,11 +2,11 @@
 
 namespace Faction\task\repeat;
 
+use Faction\entity\animation\Message;
 use Faction\handler\Cache;
 use Faction\Main;
 use Faction\Session;
 use Faction\Util;
-use Faction\entity\animation\Message;
 use pocketmine\block\utils\DyeColor;
 use pocketmine\block\VanillaBlocks;
 use pocketmine\math\Vector3;

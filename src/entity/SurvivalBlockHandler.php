@@ -137,7 +137,6 @@ final class SurvivalBlockHandler
 
         if (abs($newBreakSpeed - $this->breakSpeed) > 0.0001) {
             $this->breakSpeed = $newBreakSpeed;
-            //TODO: sync with client
         }
 
         $this->breakProgress += $this->breakSpeed;

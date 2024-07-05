@@ -100,12 +100,6 @@ class Creeper extends Living
         return false;
     }
 
-    protected function initEntity(CompoundTag $nbt, float $time = 3): void
-    {
-        parent::initEntity($nbt);
-        $this->makeExplode($time);
-    }
-
     private function makeExplode(float $time = 3.00): void
     {
         $this->getNetworkProperties()->setGenericFlag(EntityMetadataFlags::POWERED, true);
@@ -113,6 +107,12 @@ class Creeper extends Living
 
         $this->explode = true;
         $this->time = max(0, $time) * 20;
+    }
+
+    protected function initEntity(CompoundTag $nbt, float $time = 3): void
+    {
+        parent::initEntity($nbt);
+        $this->makeExplode($time);
     }
 
     protected function getInitialSizeInfo(): EntitySizeInfo

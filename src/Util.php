@@ -6,6 +6,7 @@ use Faction\command\player\XpBottle;
 use Faction\command\util\money\Money;
 use Faction\handler\Cache;
 use Faction\handler\Faction;
+use Faction\handler\Jobs;
 use Faction\handler\Rank;
 use Faction\handler\ScoreFactory;
 use Faction\item\ExtraVanillaItems;
@@ -586,6 +587,25 @@ class Util
         return trim($result);
     }
 
+    public static function formatToRomanNumber(int $integer): string
+    {
+        $romanNumber = "";
+
+        $units = [
+            "X" => 10, "IX" => 9,
+            "V" => 5, "IV" => 4,
+            "I" => 1
+        ];
+
+        foreach ($units as $unit => $value) {
+            while ($integer >= $value) {
+                $integer -= $value;
+                $romanNumber .= $unit;
+            }
+        }
+        return $romanNumber;
+    }
+
     public static function caracterToUnicode(string $input): string
     {
         return Cache::$config["unicodes"][strtolower($input)] ?? " ";
@@ -593,7 +613,6 @@ class Util
 
     public static function findAndRemoveValue(&$array, $value): void
     {
-        // TODO USE THIS EVERY ENDROIT
         $index = array_search($value, $array);
 
         if ($index !== false) {
@@ -620,7 +639,6 @@ class Util
         }), $delay);
     }
 
-
     // item:itemName:count:customName:enchantId1,enchantLevel1;enchantId2,enchantLevel2
     public static function parseItem(string $data): Item
     {
@@ -632,6 +650,8 @@ class Util
                 return XpBottle::createXpBottle(intval($data[1]) ?? 1);
             case "money":
                 return Money::createPaperMoney(intval($data[1]) ?? 1);
+            case "boost":
+                return Jobs::createBoostPaper(intval($data[1]) ?? 1, intval($data[1]) ?? 1);
             default:
                 $item = StringToItemParser::getInstance()->parse($data[1]) ?? VanillaItems::AIR();
                 $item = $item->setCount(intval($data[2] ?? 1));

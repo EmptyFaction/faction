@@ -42,8 +42,6 @@ class Cosmetics
 
     public static function combineSkin(string $skinBytes, string $cosmeticBytes): string
     {
-        // TODO Remove array
-
         $newSkinBytesArr1 = [];
         $newSkinBytesArr2 = [];
 

@@ -2,7 +2,7 @@
 
 namespace Faction\item;
 
-use Faction\item\enchantment\Enchantments;
+use Faction\item\enchantment\ExtraVanillaEnchantments;
 use Faction\Util;
 use pocketmine\block\VanillaBlocks;
 use pocketmine\data\bedrock\item\SavedItemData;
@@ -23,6 +23,7 @@ class ExtraVanillaItems
         self::addItem(VanillaItems::ENDER_PEARL(), new EnderPearl());
         self::addItem(VanillaItems::FLINT_AND_STEEL(), new FlintAndSteal());
         self::addItem(VanillaItems::COMPASS(), new Compass());
+        self::addItem(VanillaItems::PAPER(), new Paper());
 
         self::addItem(VanillaItems::CHAINMAIL_HELMET(), new TurtleArmor(408 * 0.2, 1, VanillaEffects::WATER_BREATHING(), 0));
         self::addItem(VanillaItems::CHAINMAIL_CHESTPLATE(), new TurtleArmor(593 * 0.2, 3, VanillaEffects::HASTE(), 0));
@@ -59,7 +60,7 @@ class ExtraVanillaItems
         self::addUnknowItem("creeper_spawn_egg", new CreeperEgg());
 
         new Craft();
-        new Enchantments();
+        new ExtraVanillaEnchantments();
     }
 
     public static function addItem(PmItem $item, Item $replace): void

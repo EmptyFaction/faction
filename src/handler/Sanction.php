@@ -134,7 +134,7 @@ class Sanction
             $data = Session::get($targetPlayer)->data;
             $target = strtolower($targetPlayer->getName());
 
-            $targetPlayer->kick("§fVous êtes banni de nitrofaction.\n\n§fTemps restant: §c" . $format . "\n§fRaison: §c" . $sanction);
+            $targetPlayer->kick("§fVous êtes banni de EmptyFaction.\n\n§fTemps restant: §c" . $format . "\n§fRaison: §c" . $sanction);
             Main::getInstance()->getServer()->getNetwork()->blockAddress($targetPlayer->getNetworkSession()->getIp(), min(300, $time));
         } else {
             $file = Util::getFile("data/players/" . $target);
@@ -166,7 +166,7 @@ class Sanction
             return;
         }
 
-        $targetPlayer->kick("§fVous avez été expulsé de nitrofaction.\n\nPar: §c" . $player->getName() . "\n§fRaison: §c" . $sanction);
+        $targetPlayer->kick("§fVous avez été expulsé de EmptyFaction.\n\nPar: §c" . $player->getName() . "\n§fRaison: §c" . $sanction);
         $player->sendMessage(Util::PREFIX . "Vous avez expulsé du serveur §c" . $targetPlayer->getName());
 
         Main::getInstance()->getServer()->broadcastMessage(Util::PREFIX . "Le joueur §c" . $targetPlayer->getName() . " §fa été expulsé du serveur par §c" . $player->getName() . "§f, raison: §c" . $sanction);

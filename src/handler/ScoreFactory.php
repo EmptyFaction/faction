@@ -57,7 +57,7 @@ class ScoreFactory
                 self::setScoreLine($player, $key + 1, $value);
             }
         } else {
-            self::setScore($player, "§8» §cNitro §8«");
+            self::setScore($player, "§8» §cEmpty §8«");
             self::updateScoreboard($player);
         }
     }

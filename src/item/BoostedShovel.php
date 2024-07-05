@@ -2,6 +2,9 @@
 
 namespace Faction\item;
 
+use Faction\item\enchantment\ExtraVanillaEnchantments;
+use Faction\Session;
+use Faction\Util;
 use pocketmine\block\Block;
 use pocketmine\block\VanillaBlocks;
 use pocketmine\event\player\PlayerItemUseEvent;
@@ -10,17 +13,18 @@ use pocketmine\player\Player;
 
 class BoostedShovel extends Durable
 {
-    const ENCHANT_TAG = "boosted_shovel_lvl";
-
     public function onUse(PlayerItemUseEvent $event): bool
     {
         $player = $event->getPlayer();
 
-        $targets = $this->getLineOfBlocks($player, 3 + $this->getLevel($player));
+        $targets = $this->getLineOfBlocks($player, 2 + $this->getLevel($player));
         array_shift($targets);
         $targets = array_reverse($targets);
 
-        // Check si t en combat ou dernierement en combat
+        if (Session::get($player)->inCooldown("recent_combat")) {
+            $player->sendMessage(Util::PREFIX . "Pour utilisé une pelle boostée vous devez ne pas être en combat les dernières §c60 §fsecondes !");
+            return true;
+        }
 
         foreach ($targets as $target) {
             if ($target instanceof Block && $target->hasSameTypeId(VanillaBlocks::AIR())) {
@@ -57,12 +61,16 @@ class BoostedShovel extends Durable
     private function getLevel(Player $player): int
     {
         $item = $player->getInventory()->getItemInHand();
+        $enchant = ExtraVanillaEnchantments::getEnchantmentByName("boosted_shovel");
 
-        if (is_null($item->getNamedTag()->getTag(self::ENCHANT_TAG))) {
-            $item->getNamedTag()->setInt(self::DAMAGE_TAG, 1);
+        // ? Has enchantment don't work
+        foreach ($item->getEnchantments() as $enchantment) {
+            if ($enchant->getName() === $enchantment->getType()->getName()) {
+                return $enchantment->getLevel() + 1;
+            }
         }
 
-        return $item->getNamedTag()->getInt(self::ENCHANT_TAG, 1);
+        return 1;
     }
 
     public function getMaxDurability(): int

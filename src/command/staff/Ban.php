@@ -64,7 +64,7 @@ class Ban extends BaseCommand
             $reason = $data[2];
 
             Main::getInstance()->getServer()->getNetwork()->blockAddress($player->getNetworkSession()->getIp(), 600);
-            $player->kick("§fVous êtes banni de nitrofaction.\n\n§fTemps restant: §c" . $time . "\n§fRaison: §c" . $reason . "\n§fStaff: §c" . $staff);
+            $player->kick("§fVous êtes banni de EmptyFaction.\n\n§fTemps restant: §c" . $time . "\n§fRaison: §c" . $reason . "\n§fStaff: §c" . $staff);
 
             return true;
         } else {

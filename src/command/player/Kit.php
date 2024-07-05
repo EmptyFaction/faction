@@ -3,18 +3,15 @@
 namespace Faction\command\player;
 
 use CortexPE\Commando\BaseCommand;
+use Faction\handler\Cache;
 use Faction\handler\Rank;
 use Faction\Session;
 use Faction\Util;
+use jojoe77777\FormAPI\CustomForm;
 use jojoe77777\FormAPI\SimpleForm;
-use parallel\Events\Input;
 use pocketmine\command\CommandSender;
 use pocketmine\item\Armor;
-use pocketmine\item\enchantment\EnchantmentInstance;
-use pocketmine\item\enchantment\VanillaEnchantments;
-use pocketmine\item\PotionType;
 use pocketmine\item\VanillaItems;
-use pocketmine\network\mcpe\protocol\types\InputMode;
 use pocketmine\permission\DefaultPermissions;
 use pocketmine\player\Player;
 use pocketmine\plugin\PluginBase;
@@ -43,18 +40,24 @@ class Kit extends BaseCommand
             }
 
             $form = new SimpleForm(function (Player $player, mixed $data) use ($session) {
-                if (!is_string($data)) {
+                $kits = self::getKits();
+
+                if (!is_string($data) || !isset($kits[$data])) {
                     return;
                 }
 
-                $kit = self::getKits()[$data];
+                $kit = $kits[$data];
 
-                if (!Rank::hasRank($player, $kit["rank"])) {
-                    $player->sendMessage(Util::PREFIX . "Vous n'avez pas la permission de prendre ce kit");
+                if (!Rank::hasRank($player, $data) && !in_array($data, $session->data["kits"])) {
+                    if (!in_array($data, $session->data["kits"])) {
+                        $this->purchaseKit($player, $data);
+                    } else {
+                        $player->sendMessage(Util::PREFIX . "Vous n'avez pas la permission de prendre ce kit");
+                    }
                     return;
                 } else if ($session->inCooldown("kit_" . $data) && !$player->hasPermission(DefaultPermissions::ROOT_OPERATOR)) {
                     $format = Util::formatDurationFromSeconds($session->getCooldownData("kit_" . $data)[0] - time(), 1);
-                    $player->sendMessage(Util::PREFIX . "Vous ne pourrez re-prendre le kit §c" . $data . " §fque dans: §c" . $format);
+                    $player->sendMessage(Util::PREFIX . "Vous ne pourrez re-prendre le kit §c" . ucfirst($data) . " §fque dans: §c" . $format);
                     return;
                 }
 
@@ -68,135 +71,104 @@ class Kit extends BaseCommand
                         }
                     }
 
-                    if ($item->equals(VanillaItems::NAUTILUS_SHELL()) && $player->getNetworkSession()->getPlayerInfo()->getExtraData()["CurrentInputMode"] === InputMode::MOUSE_KEYBOARD) {
-                        $item->setCount(0);
-                    }
-
-                    if ($item->equals(VanillaItems::ENDER_PEARL())) {
-                        $item->setCount(max(32 - Util::getItemCount($player, VanillaItems::ENDER_PEARL()), 0));
-                    }
-
                     $player->getInventory()->addItem($item);
                 }
 
-                $player->sendMessage(Util::PREFIX . "Vous venez de recevoir votre kit !");
+                $player->sendMessage(Util::PREFIX . "Vous venez de recevoir votre kit §c" . ucfirst($data) . " §f!");
             });
             $form->setTitle("Kit");
             $form->setContent(Util::ARROW . "Quel kit voulez-vous prendre");
+            foreach (self::getKits() as $name => $value) {
+                $format = ucfirst(strtolower($name));
 
-            foreach (self::getKits() as $key => $value) {
-                $name = ucfirst(strtolower($key));
-
-                if (!Rank::hasRank($sender, $value["rank"])) {
-                    $name .= "\n§cNon débloqué";
-                } else if ($session->inCooldown("kit_" . $key) && !$sender->hasPermission(DefaultPermissions::ROOT_OPERATOR)) {
-                    $format = Util::formatDurationFromSeconds($session->getCooldownData("kit_" . $key)[0] - time(), 1);
-                    $name .= " §c(Cooldown)\n" . $format;
+                if (!Rank::hasRank($sender, $name) && !in_array($name, $session->data["kits"])) {
+                    if ($value["purchasable"]) {
+                        $format .= "\n§cNon acheté";
+                    } else {
+                        $format .= "\n§cGrade inférieur";
+                    }
+                } else if ($session->inCooldown("kit_" . $name) && !$sender->hasPermission(DefaultPermissions::ROOT_OPERATOR)) {
+                    $format = Util::formatDurationFromSeconds($session->getCooldownData("kit_" . $name)[0] - time(), 1);
+                    $format .= " §c(Cooldown)\n" . $format;
                 }
 
-                $form->addButton($name, -1, "", $key);
+                $form->addButton($format, -1, "", $name);
             }
             $sender->sendForm($form);
         }
     }
 
+    private function purchaseKit(Player $player, string $kit): void
+    {
+        $kits = self::getKits();
+
+        if (!isset($kits[$kit])) {
+            return;
+        }
+
+        $kit = $kits[$kit];
+
+        $session = Session::get($player);
+
+        $form = new CustomForm(function (Player $player, mixed $data) use ($session, $kit) {
+            if (!is_array($data) || !isset($data[1]) || !isset($data[2]) || !is_bool($data[2]) || !$data[2]) {
+                return;
+            }
+
+            $devise = match ($data[1]) {
+                1 => " §fECoins",
+                default => "$"
+            };
+
+            $money = match ($data[1]) {
+                1 => "ecoin",
+                default => "money"
+            };
+
+            if ($kit["price"][$money] > $session->data[$money]) {
+                $player->sendMessage(Util::PREFIX . "Vous ne possedez pas assez de " . $devise . " pour acheter le kit §c" . ucfirst($kit["name"]));
+                return;
+            }
+
+            $session->data["kits"][] = $kit;
+
+            $session->addValue($money, $kit["price"][$money], true);
+            $player->sendMessage(Util::PREFIX . "Vous venez d'acheter le kit §c" . ucfirst($kit["name"]) . " §favec §c" . $kit["price"][$money] . $devise);
+        });
+        $form->setTitle("Kit");
+
+        if ($kit["purchasable"]) {
+            $form->addLabel(Util::ARROW . "Voulez vous acheter le kit §c" . ucfirst($kit["name"]) . " §f?\nPour une preview du kit faire §c/previewkit\n\n§fPrix: §c" . Util::formatNumberWithSuffix($kit["price"]["money"]) . "$ §fou §c" . $kit["price"]["ecoin"] . " §fECoins\n\nVous possedez §c" . $session->data["ecoin"] . " §fECoins\nVous possedez §c" . $session->data["money"] . "$\n");
+            $form->addDropdown("Méthode de payement", ["Argent", "ECoins"]);
+            $form->addToggle("Acheter le kit §c" . ucfirst($kit["name"]) . " §f?", true);
+        } else {
+            $form->addLabel(Util::ARROW . "Ce kit n'est pas achetable");
+        }
+
+        $player->sendForm($form);
+    }
+
     public static function getKits(): array
     {
-        $unbreaking = new EnchantmentInstance(VanillaEnchantments::UNBREAKING(), 3);
-        $protection = new EnchantmentInstance(VanillaEnchantments::PROTECTION(), 2);
-        $efficiency = new EnchantmentInstance(VanillaEnchantments::EFFICIENCY(), 5);
-        $sharpness = new EnchantmentInstance(VanillaEnchantments::SHARPNESS(), 2);
+        $kits = [];
 
-        return [
-            "refill" => [
-                "items" => [
-                    VanillaItems::NAUTILUS_SHELL(),
-                    VanillaItems::ENDER_PEARL()->setCount(32),
-                    VanillaItems::SPLASH_POTION()->setType(PotionType::STRONG_HEALING())->setCount(40)
-                ],
-                "cooldown" => 5,
-                "rank" => "joueur"
-            ],
-            "mineur" => [
-                "items" => [
-                    VanillaItems::DIAMOND_PICKAXE()->addEnchantment($unbreaking)->addEnchantment($efficiency),
-                    VanillaItems::DIAMOND_AXE()->addEnchantment($unbreaking)->addEnchantment($efficiency),
-                    VanillaItems::DIAMOND_SHOVEL()->addEnchantment($unbreaking)->addEnchantment($efficiency),
-                    VanillaItems::DIAMOND_HOE()->addEnchantment($unbreaking),
-                    VanillaItems::COOKED_SALMON()->setCount(2),
-                    VanillaItems::COOKED_FISH()->setCount(2),
-                    VanillaItems::RAW_SALMON()->setCount(2)
-                ],
-                "cooldown" => 60,
-                "rank" => "joueur"
-            ],
-            "joueur" => [
-                "items" => [
-                    VanillaItems::DIAMOND_HELMET()->addEnchantment($unbreaking)->addEnchantment($protection),
-                    VanillaItems::DIAMOND_CHESTPLATE()->addEnchantment($unbreaking)->addEnchantment($protection),
-                    VanillaItems::DIAMOND_LEGGINGS()->addEnchantment($unbreaking)->addEnchantment($protection),
-                    VanillaItems::DIAMOND_BOOTS()->addEnchantment($unbreaking)->addEnchantment($protection),
-                    VanillaItems::DIAMOND_SWORD()->addEnchantment($sharpness)->addEnchantment($unbreaking),
-                    VanillaItems::COOKED_SALMON()->setCount(4),
-                    VanillaItems::COOKED_FISH()->setCount(4),
-                    VanillaItems::RAW_SALMON()->setCount(4)
-                ],
-                "cooldown" => 60,
-                "rank" => "joueur"
-            ],
-            "champion" => [
-                "items" => [
-                    VanillaItems::GOLDEN_HELMET()->addEnchantment($unbreaking)->addEnchantment($protection),
-                    VanillaItems::DIAMOND_CHESTPLATE()->addEnchantment($unbreaking)->addEnchantment($protection),
-                    VanillaItems::DIAMOND_LEGGINGS()->addEnchantment($unbreaking)->addEnchantment($protection),
-                    VanillaItems::DIAMOND_BOOTS()->addEnchantment($unbreaking)->addEnchantment($protection),
-                    VanillaItems::DIAMOND_SWORD()->addEnchantment($sharpness)->addEnchantment($unbreaking),
-                    VanillaItems::COOKED_SALMON()->setCount(8),
-                    VanillaItems::COOKED_FISH()->setCount(8),
-                    VanillaItems::RAW_SALMON()->setCount(8)
-                ],
-                "cooldown" => 60 * 60,
-                "rank" => "champion"
-            ],
-            "prince" => [
-                "items" => [
-                    VanillaItems::GOLDEN_HELMET()->addEnchantment($unbreaking)->addEnchantment($protection),
-                    VanillaItems::DIAMOND_CHESTPLATE()->addEnchantment($unbreaking)->addEnchantment($protection),
-                    VanillaItems::DIAMOND_LEGGINGS()->addEnchantment($unbreaking)->addEnchantment($protection),
-                    VanillaItems::GOLDEN_BOOTS()->addEnchantment($unbreaking)->addEnchantment($protection),
-                    VanillaItems::DIAMOND_SWORD()->addEnchantment($sharpness)->addEnchantment($unbreaking),
-                    VanillaItems::COOKED_SALMON()->setCount(16),
-                    VanillaItems::COOKED_FISH()->setCount(16),
-                    VanillaItems::RAW_SALMON()->setCount(16)
-                ],
-                "cooldown" => 60 * 60 * 2,
-                "rank" => "prince"
-            ],
-            "elite" => [
-                "items" => [
-                    VanillaItems::GOLDEN_HELMET()->addEnchantment($unbreaking)->addEnchantment($protection),
-                    VanillaItems::GOLDEN_CHESTPLATE()->addEnchantment($unbreaking)->addEnchantment($protection),
-                    VanillaItems::GOLDEN_LEGGINGS()->addEnchantment($unbreaking)->addEnchantment($protection),
-                    VanillaItems::GOLDEN_BOOTS()->addEnchantment($unbreaking)->addEnchantment($protection),
-                    VanillaItems::DIAMOND_SWORD()->addEnchantment($sharpness)->addEnchantment($unbreaking),
-                    VanillaItems::RAW_FISH()->setCount(16)
-                ],
-                "cooldown" => 60 * 60 * 3,
-                "rank" => "elite"
-            ],
-            "roi" => [
-                "items" => [
-                    VanillaItems::GOLDEN_HELMET()->addEnchantment($unbreaking)->addEnchantment($protection),
-                    VanillaItems::GOLDEN_CHESTPLATE()->addEnchantment($unbreaking)->addEnchantment($protection),
-                    VanillaItems::GOLDEN_LEGGINGS()->addEnchantment($unbreaking)->addEnchantment($protection),
-                    VanillaItems::GOLDEN_BOOTS()->addEnchantment($unbreaking)->addEnchantment($protection),
-                    VanillaItems::GOLDEN_SWORD()->addEnchantment($sharpness)->addEnchantment($unbreaking),
-                    VanillaItems::RAW_FISH()->setCount(16)
-                ],
-                "cooldown" => 60 * 60 * 4,
-                "rank" => "roi"
-            ]
-        ];
+        foreach (Cache::$config["kits"] as $name => $data) {
+            $items = [];
+
+            foreach ($data["items"] as $item) {
+                $items[] = Util::parseItem($item);
+            }
+
+            $kits[$name] = [
+                "items" => $items,
+                "purchasable" => $data["price"]["ecoin"] > 0,
+                "price" => $data["price"],
+                "cooldown" => $data["cooldown"],
+                "name" => $name
+            ];
+        }
+
+        return $kits;
     }
 
     protected function prepare(): void

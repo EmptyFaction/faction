@@ -7,7 +7,7 @@ use Faction\task\async\SendMessageTask;
 
 class Discord
 {
-    const USERNAME = "Nitro";
+    const USERNAME = "EmptyFaction";
 
     public static function send($data, $webhook): void
     {

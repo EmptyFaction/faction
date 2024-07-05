@@ -11,6 +11,7 @@ use Faction\entity\Creeper;
 use Faction\entity\LogoutNpc;
 use Faction\entity\Player as CustomPlayer;
 use Faction\handler\{Cache, Cosmetics, Faction, Jobs, Rank};
+use Faction\item\enchantment\ExtraVanillaEnchantments;
 use Faction\item\ExtraVanillaItems;
 use Faction\item\FarmAxe;
 use Faction\Main;
@@ -73,6 +74,8 @@ use Symfony\Component\Filesystem\Path;
 
 class EventsListener implements Listener
 {
+    public static array $faces = [];
+
     public function onCreation(PlayerCreationEvent $event): void
     {
         $event->setPlayerClass(CustomPlayer::class);
@@ -84,6 +87,7 @@ class EventsListener implements Listener
 
         $block = $event->getBlock();
         $item = $event->getItem();
+
 
         if (
             $event->getAction() === $event::RIGHT_CLICK_BLOCK &&
@@ -98,6 +102,8 @@ class EventsListener implements Listener
             }
 
             return;
+        } else if ($event->getAction() === $event::LEFT_CLICK_BLOCK) {
+            self::$faces[$event->getPlayer()->getXuid()] = $event->getFace();
         }
 
         if (!ExtraVanillaItems::getItem($item)->onInteract($event)) {
@@ -405,6 +411,9 @@ class EventsListener implements Listener
                 $damagerSession->setCooldown("combat", 30, [$entity->getName()]);
                 $entitySession->setCooldown("combat", 30, [$damager->getName()]);
 
+                $damagerSession->setCooldown("recent_combat", 60);
+                $entitySession->setCooldown("recent_combat", 60);
+
                 $event->setKnockback(0.38);
                 $event->setAttackCooldown(8);
             }
@@ -639,6 +648,10 @@ class EventsListener implements Listener
             Jobs::addXp($player, "Miner", $xp);
         }
 
+        foreach ($event->getItem()->getEnchantments() as $enchant) {
+            ExtraVanillaEnchantments::getEnchantment($enchant->getType())->onBreak($event, $enchant);
+        }
+
         Util::addItems($player, $event->getDrops());
 
         if ($event->getXpDropAmount() > 0) {
@@ -735,7 +748,7 @@ class EventsListener implements Listener
             $durability = null;
             $position = $block->getPosition();
 
-            $filteredBlocks = array_filter($safeBlocks, function($value) use ($block) {
+            $filteredBlocks = array_filter($safeBlocks, function ($value) use ($block) {
                 return $value instanceof Block && $value instanceof $block;
             });
 

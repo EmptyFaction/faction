@@ -4,6 +4,10 @@ namespace Faction\handler;
 
 use Faction\Session;
 use Faction\Util;
+use pocketmine\item\enchantment\EnchantmentInstance;
+use pocketmine\item\enchantment\VanillaEnchantments;
+use pocketmine\item\Item;
+use pocketmine\item\VanillaItems;
 use pocketmine\player\Player;
 use pocketmine\world\sound\BlazeShootSound;
 use pocketmine\world\sound\XpCollectSound;
@@ -64,6 +68,7 @@ class Jobs
         }
 
         $session = Session::get($player);
+        $xp = round($xp * (1 + (self::getBoost($session) / 100)));
 
         $levelIndex = self::getLevelIndex($player, $job);
         $levelData = self::getLevelDataByIndex($job, $levelIndex);
@@ -93,5 +98,25 @@ class Jobs
             $session->data["jobs"][$job]["xp"] += $xp;
             $player->broadcastSound(new XpCollectSound());
         }
+    }
+
+    public static function getBoost(Session $session): int
+    {
+        $init = Rank::getRankValue(Rank::getEqualRankBySession($session), "boost");
+
+        if ($session->inCooldown("xp_boost")) {
+            $init += $session->getCooldownData("xp_boost")[1];
+        }
+        return $init;
+    }
+
+    public static function createBoostPaper(int $boost, int $duration): Item
+    {
+        $item = VanillaItems::PAPER();
+        $item->getNamedTag()->setInt("xp_boost", $boost);
+        $item->getNamedTag()->setInt("duration", $duration);
+        $item->addEnchantment(new EnchantmentInstance(VanillaEnchantments::FORTUNE()));
+        $item->setCustomName("§r§fBoost d'xp de §c" . $boost . "% §7(" . Util::formatDurationFromSeconds($duration, 1) . ")");
+        return $item;
     }
 }

@@ -32,7 +32,7 @@ class Buy extends BaseCommand
 
         if (isset(Cache::$config["ranks"][$value])) {
             Util::executeCommand("setrank \"" . $player . "\" " . $value);
-            Main::getInstance()->getServer()->broadcastMessage(Util::PREFIX . "Le joueur §c" . $player . " §fvient d'acheter le grade §c" . $value . " §fsur la boutique ! §chttps://nitrofaction.tebex.io");
+            Main::getInstance()->getServer()->broadcastMessage(Util::PREFIX . "Le joueur §c" . $player . " §fvient d'acheter le grade §c" . $value . " §fsur la boutique ! §chttps://emptyfaction.tebex.io");
         } else {
             if (str_contains($value, "unban")) {
                 if (!isset(Cache::$bans[$player])) {
@@ -47,7 +47,7 @@ class Buy extends BaseCommand
                 $seconds = $data[1] - time();
                 $days = $seconds / 86400;
 
-                Main::getInstance()->getServer()->broadcastMessage(Util::PREFIX . "Le joueur §c" . $player . " §fvient d'acheter un §cunban §fsur la boutique ! §chttps://nitrofaction.tebex.io");
+                Main::getInstance()->getServer()->broadcastMessage(Util::PREFIX . "Le joueur §c" . $player . " §fvient d'acheter un §cunban §fsur la boutique ! §chttps://emptyfaction.tebex.io");
 
                 if ($maxDays > $days) {
                     Util::executeCommand("unban \"" . $player . "\"");

@@ -50,8 +50,6 @@ class Block extends BaseCommand
 
                 $blocks[] = $player->getName();
             }
-
-            // TODO Check si ça work pcq vsy
         }
     }
 

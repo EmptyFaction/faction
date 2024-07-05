@@ -302,7 +302,6 @@ class Player extends PmPlayer
 
         $this->getHungerManager()->setFood(18);
 
-        // TODO Opti peut être ici
         if ($this->ticksLived % 5 == 0) {
             $x = $this->getPosition()->getX();
             $z = $this->getPosition()->getZ();
@@ -324,8 +323,6 @@ class Player extends PmPlayer
                 $this->knockBack($motionX, $motionZ, $knockBackIntensity);
                 $this->sendPopup(Util::ARROW . "Vous avez dépassé la bordure" . Util::IARROW);
             }
-
-            // TODO FIX ACTUAL OFF HAND ITEM
 
             $oldItem = $this->actualHandItem;
             $handItem = $this->getInventory()->getItemInHand();

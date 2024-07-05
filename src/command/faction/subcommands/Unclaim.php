@@ -33,7 +33,6 @@ class Unclaim extends FactionCommand
             return;
         }
 
-        // Todo try
         Util::findAndRemoveValue(Cache::$factions[$faction]["claims"], $claim[2]);
         unset(Cache::$claims[$claim[2]]);
 

@@ -2,6 +2,10 @@
 
 namespace Faction\block;
 
+use Faction\item\BoostedShovel;
+use Faction\item\enchantment\ExtraVanillaEnchantments;
+use Faction\item\ExtraVanillaItems;
+use Faction\item\FarmAxe;
 use Faction\Util;
 use jojoe77777\FormAPI\SimpleForm;
 use pocketmine\data\bedrock\EnchantmentIdMap;
@@ -56,16 +60,30 @@ class EnchantingTable extends Durability
 
         // Id Enchant ; Name Enchant ; Levels Enchant ; XP Enchants ; Lapis Enchants
 
+        $citem = ExtraVanillaItems::getItem($item);
+
         if ($item instanceof Sword) {
             $form->addButton("Tranchant", label: EnchantmentIds::SHARPNESS . ";Tranchant;5;6;32");
         } else if ($item instanceof Armor) {
             $form->addButton("Protection", label: EnchantmentIds::PROTECTION . ";Protection;4;8;32");
         } else if ($item instanceof Pickaxe || $item instanceof Axe || $item instanceof Shovel) {
             $form->addButton("Efficacité", label: EnchantmentIds::EFFICIENCY . ";Efficacité;5;6;32");
-            $form->addButton("Toucher de soie", label: EnchantmentIds::SILK_TOUCH . ";Toucher de soie;1;60;128");
         }
 
         $form->addButton("Solidité", label: EnchantmentIds::UNBREAKING . ";Solidité;3;10;32");
+
+        if ($citem instanceof BoostedShovel) {
+            // TODO REGARDER SI C BN PCQ VASY JSUIS PTETRE UN ZEUB
+            $form->addButton("Pelle boostée", label: ExtraVanillaEnchantments::BOOSTED_SHOVEL . ";Pelle Boostée;2;6;32");
+        } else if ($item instanceof Pickaxe || $citem instanceof FarmAxe) {
+            $form->addButton("Double pioche", label: ExtraVanillaEnchantments::DOUBLE_PICKAXE . ";Double Pioche;1;30;64");
+            $form->addButton("Hammer", label: ExtraVanillaEnchantments::HAMMER . ";Hammer;1;60;128");
+        }
+
+        if ($item instanceof Pickaxe || $item instanceof Axe || $item instanceof Shovel) {
+            $form->addButton("Toucher de soie", label: EnchantmentIds::SILK_TOUCH . ";Toucher de soie;1;60;128");
+            $form->addButton("Tokenator", label: ExtraVanillaEnchantments::TOKENATOR . ";Tokenator;3;6;32");
+        }
 
         $player->sendForm($form);
     }
@@ -144,6 +162,7 @@ class EnchantingTable extends Durability
         }
 
         $item->addEnchantment($enchantInstance);
+        $item = ExtraVanillaEnchantments::updateLore($item, $enchantInstance);
 
         $player->getXpManager()->setXpLevel($player->getXpManager()->getXpLevel() - $priceLevels);
         $player->getInventory()->removeItem(VanillaItems::LAPIS_LAZULI()->setCount($priceLapis));

@@ -110,24 +110,6 @@ class Luckyblock extends Block
         return null;
     }
 
-    public function getRewardPercentages(): array
-    {
-        $rewards = $this->getRewards();
-        $result = [];
-
-        $totalWeight = array_sum(array_map("floatval", array_keys($rewards)));
-        $i = 0;
-
-        foreach ($rewards as $weight => $reward) {
-            $percentage = number_format((floatval($weight) / $totalWeight) * 100, 2);
-            $result[$i . "|" . $percentage] = $reward;
-
-            $i++;
-        }
-
-        return $result;
-    }
-
     public function getRewards(): array
     {
         return [
@@ -174,32 +156,6 @@ class Luckyblock extends Block
             // TODO KING KONG
             // TODO AJOUTER UNE CAPE
         ];
-    }
-
-    public function onInteract(PlayerInteractEvent $event): bool
-    {
-        $player = $event->getPlayer();
-
-        if ($event->getAction() === $event::RIGHT_CLICK_BLOCK && $player->isSneaking() && !$this->inCooldown($player)) {
-            $this->sendRewardsPercentagesForm($player);
-            $this->setCooldown($player, 1);
-        }
-
-        return false;
-    }
-
-    public function sendRewardsPercentagesForm(Player $player): void
-    {
-        $content = Util::ARROW . "Voici toutes les récompenses possible grace aux luckyblocks\n";
-
-        foreach ($this->getRewardPercentages() as $percentage => $data) {
-            $content .= "\n§c" . explode("|", $percentage)[1] . "% " . Util::ARROW . $data[0];
-        }
-
-        $form = new SimpleForm(null);
-        $form->setTitle("LuckyBlock");
-        $form->setContent($content);
-        $player->sendForm($form);
     }
 
     public function createPrison(Player $player): void
@@ -274,6 +230,50 @@ class Luckyblock extends Block
                 $world->addSound($randomPos, new ClickSound());
             }
         }
+    }
+
+    public function onInteract(PlayerInteractEvent $event): bool
+    {
+        $player = $event->getPlayer();
+
+        if ($event->getAction() === $event::RIGHT_CLICK_BLOCK && $player->isSneaking() && !$this->inCooldown($player)) {
+            $this->sendRewardsPercentagesForm($player);
+            $this->setCooldown($player, 1);
+        }
+
+        return false;
+    }
+
+    public function sendRewardsPercentagesForm(Player $player): void
+    {
+        $content = Util::ARROW . "Voici toutes les récompenses possible grace aux luckyblocks\n";
+
+        foreach ($this->getRewardPercentages() as $percentage => $data) {
+            $content .= "\n§c" . explode("|", $percentage)[1] . "% " . Util::ARROW . $data[0];
+        }
+
+        $form = new SimpleForm(null);
+        $form->setTitle("LuckyBlock");
+        $form->setContent($content);
+        $player->sendForm($form);
+    }
+
+    public function getRewardPercentages(): array
+    {
+        $rewards = $this->getRewards();
+        $result = [];
+
+        $totalWeight = array_sum(array_map("floatval", array_keys($rewards)));
+        $i = 0;
+
+        foreach ($rewards as $weight => $reward) {
+            $percentage = number_format((floatval($weight) / $totalWeight) * 100, 2);
+            $result[$i . "|" . $percentage] = $reward;
+
+            $i++;
+        }
+
+        return $result;
     }
 
     public function getDrops(PmBlock $block, Item $item, Player $player = null): ?array

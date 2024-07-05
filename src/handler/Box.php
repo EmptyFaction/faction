@@ -65,7 +65,7 @@ class Box
         if (is_null($data)) {
             return;
         } else if (Session::get($player)->inCooldown("box_" . strtolower($data["name"]))) {
-            $player->sendMessage(Util::PREFIX . "Veuillez attendre un peu avant de ré-ouvrir une box..");
+            $player->sendMessage(Util::PREFIX . "Veuillez attendre un peu avant de ré-ouvrir cette box..");
             return;
         }
 
@@ -107,12 +107,18 @@ class Box
         foreach (Cache::$config["box"] as $name => $data) {
             $format = $position->getFloorX() . ":" . $position->getFloorY() . ":" . $position->getFloorZ();
 
-            if ($data["pos"] === $format) {
+            if (self::getPos($data["pos"]) === self::getPos($format)) {
                 $data["name"] = $name;
                 return $data;
             }
         }
 
         return null;
+    }
+
+    private static function getPos(string $pos): array
+    {
+        [$x, $y, $z] = explode(":", $pos);
+        return [intval($x), intval($y), intval($z)];
     }
 }
